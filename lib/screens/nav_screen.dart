@@ -4,18 +4,22 @@ import 'package:asm_sales_tracker/screens/lead_creationpage.dart';
 import 'package:flutter/material.dart';
 
 class Nav_Screen extends StatefulWidget {
+  Nav_Screen({
+    super.key,
+  });
+
   @override
   _Nav_ScreenState createState() => _Nav_ScreenState();
 }
 
 class _Nav_ScreenState extends State<Nav_Screen> {
+  int _currentindex = 0;
   late PageController _pageController;
-  int _currentIndex = 0;
 
   @override
   void initState() {
     super.initState();
-    _pageController = PageController(initialPage: _currentIndex);
+    _pageController = PageController(initialPage: _currentindex);
   }
 
   @override
@@ -26,7 +30,7 @@ class _Nav_ScreenState extends State<Nav_Screen> {
 
   void onTabTapped(int index) {
     setState(() {
-      _currentIndex = index;
+      _currentindex = index;
       _pageController.jumpToPage(index);
     });
   }
@@ -44,12 +48,13 @@ class _Nav_ScreenState extends State<Nav_Screen> {
         ],
         onPageChanged: (int index) {
           setState(() {
-            _currentIndex = index;
+            _currentindex = index;
           });
         },
       ),
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
+        // fixedColor: Colors.amber,
+        currentIndex: _currentindex,
         onTap: onTabTapped,
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(

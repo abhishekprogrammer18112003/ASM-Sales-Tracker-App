@@ -6,6 +6,7 @@ import 'package:asm_sales_tracker/screens/nav_screen.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Login_Screen extends StatefulWidget {
   @override
@@ -38,6 +39,11 @@ class _Login_ScreenState extends State<Login_Screen> {
       // Login successful.
       // You can save the user's session token or navigate to the next screen here.
       if (data['status'] == 'Success') {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setString('login_enc_id', data['enc_id']);
+        prefs.setString(
+            'login_mobile_number', _mobileController.text.toString());
+        prefs.setBool('login_islogin', true);
         Navigator.pushReplacement(
             context, MaterialPageRoute(builder: (context) => Nav_Screen()));
       } else {}
