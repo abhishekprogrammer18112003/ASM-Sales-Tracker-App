@@ -18,19 +18,6 @@ class Lead_Creation_page extends StatefulWidget {
 // ignore: camel_case_types
 class _Lead_Creation_pageState extends State<Lead_Creation_page> {
   bool imageselected = false;
-  // late String Login_enc_id;
-
-  // void setenc_id() async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   Login_enc_id = prefs.getString("login_enc_id")!;
-  // }
-
-  // void initState() async {
-  //   super.initState();
-  //   setenc_id();
-  //   // fetchDatacement();
-  //   // fetchDatasteel();
-  // }
 
   final _formKey1 = GlobalKey<FormState>();
   final _formKey2 = GlobalKey<FormState>();
@@ -62,41 +49,62 @@ class _Lead_Creation_pageState extends State<Lead_Creation_page> {
   final _brick = TextEditingController();
   final _sand = TextEditingController();
   final _otheritems = TextEditingController();
+  String? loginenc_id;
+  void getencid() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    loginenc_id = prefs.getString("login_enc_id");
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getencid();
+    getsteeldate();
+    getcementdate();
+  }
 
   String? _selectcement;
-  List<String> _cementoptions = ['Cement 1', 'cement 2'];
+  List<dynamic> _cementoptions = [];
+  String? cementindex;
 
-  // void fetchDatacement() async {
-  //   final url = Uri.parse('https://asm.sortbe.com/api/Cement-List');
-  //   final response = await http.get(url);
+  Future<List?> getcementdate() async {
+    print('****************************');
+    final response = await http
+        .post(Uri.parse("https://asm.sortbe.com/api/Cement-List"), body: {
+      'enc_string': 'HSjLAS82146',
+    });
 
-  //   if (response.statusCode == 200) {
-  //     final jsonData = jsonDecode(response.body);
-  //     setState(() {
-  //       _cementoptions = List<String>.from(jsonData['cement_name']);
-  //     });
-  //   } else {
-  //     throw Exception('Failed to load data');
-  //   }
-  // }
+    if (response.statusCode == 200) {
+      print("done Cement");
+      final data = jsonDecode(response.body.toString());
+      _cementoptions.addAll(data['cement_name']);
+      return _cementoptions;
+    } else {
+      return null;
+    }
+  }
 
   @override
   String? _selectsteel;
-  List<String> _steeloptions = ['steel 1', 'steel 2'];
-  // void fetchDatasteel() async {
-  //   final url = Uri.parse('https://asm.sortbe.com/api/Steel-List');
-  //   final response = await http.get(url);
+  String? steelindex;
+  List<dynamic> _steeloptions = [];
+  Future<List?> getsteeldate() async {
+    print('****************************');
+    final response = await http
+        .post(Uri.parse("https://asm.sortbe.com/api/Steel-List"), body: {
+      'enc_string': 'HSjLAS82146',
+    });
 
-  //   if (response.statusCode == 200) {
-  //     final jsonData = jsonDecode(response.body);
-  //     setState(() {
-  //       _steeloptions = List<String>.from(jsonData['steel_name']);
-  //     });
-  //   } else {
-  //     throw Exception('Failed to load data');
-  //   }
-  // }
-  // final _ = TextEditingController();
+    if (response.statusCode == 200) {
+      print("done steel");
+      final data = jsonDecode(response.body.toString());
+      _steeloptions.addAll(data['steel_name']);
+      return _steeloptions;
+    } else {
+      return null;
+    }
+  }
 
   //seller details
   final _sellername = TextEditingController();
@@ -145,56 +153,59 @@ class _Lead_Creation_pageState extends State<Lead_Creation_page> {
 
   bool _isloading = false;
 
-  // Future<void> _submit(String cement_id, String steel_id) async {
-  //   setState(() {
-  //     _isloading = true;
-  //   });
-  //   final response = await http
-  //       .post(Uri.parse('https://asm.sortbe.com/api/Create-Lead'), body: {
-  //     'enc_string': 'HSjLAS82146',
-  //     'name': _name.text.toString(),
-  //     'mobile': _mobile.text.toString(),
-  //     'email': _email.text.toString(),
-  //     'address': _address.text.toString(),
-  //     'gst': _gst.text.toString(),
-  //     'client_type': _selecttype,
-  //     'enc_id': Login_enc_id,
-  //     'project_name': _projname.text.toString(),
-  //     'location': _location.text.toString(),
-  //     'sqft': _abuildingsqft.text.toString(),
-  //     'building_type': _typeofbuilding.text.toString(),
-  //     'cement_id': cement_id,
-  //     'steel_id': steel_id,
-  //     'brick': _brick.text.toString(),
-  //     'sand': _sand.text.toString(),
-  //     'other_items': _otheritems.text.toString(),
-  //     'perv_seller_name': _sellername.text.toString(),
-  //     'brand': _brand.text.toString(),
-  //     'pricing': _pricing.text.toString(),
-  //     'prev_seller_address': _selleraddress.text.toString(),
-  //     'prev_seller_contact_no': _sellermobile.text.toString(),
-  //   });
-  //   var data = jsonDecode(response.body.toString());
-  //   setState(() {
-  //     _isloading = false;
-  //   });
-  //   if (response.statusCode == 200) {
-  //     // Login successful.
-  //     // You can save the user's session token or navigate to the next screen here.
-  //     if (data['status'] == 'Success') {
-  //       Navigator.push(
-  //           context, MaterialPageRoute(builder: (context) => Nav_Screen()));
-  //     } else {}
-  //   } else {
-  //     // Login failed.
-  //     // You can display an error message here.
-  //   }
-  // }
+  Future<void> _submit(String cement_id, String steel_id) async {
+    print("**********************");
+    setState(() {
+      _isloading = true;
+    });
+    final response = await http
+        .post(Uri.parse('https://asm.sortbe.com/api/Create-Lead'), body: {
+      'enc_string': 'HSjLAS82146',
+      'name': _name.text.toString(),
+      'mobile': _mobile.text.toString(),
+      'email': _email.text.toString(),
+      'address': _address.text.toString(),
+      'gst': _gst.text.toString(),
+      'client_type': _selecttype,
+      'enc_id': loginenc_id,
+      'project_name': _projname.text.toString(),
+      'location': _location.text.toString(),
+      'sqft': _abuildingsqft.text.toString(),
+      'building_type': _typeofbuilding.text.toString(),
+      'cement_id': cement_id,
+      'steel_id': steel_id,
+      'brick': _brick.text.toString(),
+      'sand': _sand.text.toString(),
+      'other_items': _otheritems.text.toString(),
+      'perv_seller_name': _sellername.text.toString(),
+      'brand': _brand.text.toString(),
+      'pricing': _pricing.text.toString(),
+      'prev_seller_address': _selleraddress.text.toString(),
+      'prev_seller_contact_no': _sellermobile.text.toString(),
+    });
+    print("*************************************");
+    var data = jsonDecode(response.body.toString());
+    setState(() {
+      _isloading = false;
+    });
+    print(data);
+    if (response.statusCode == 200) {
+      print("*****************");
+      // Login successful.
+      // You can save the user's session token or navigate to the next screen here.
+      if (data['status'] == 'Success') {
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => Nav_Screen()));
+      } else {}
+    } else {
+      // Login failed.
+      // You can display an error message here.
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(title: Text('lead')),
       body: PageView(
         physics: const NeverScrollableScrollPhysics(),
         controller: _pageController,
@@ -227,7 +238,7 @@ class _Lead_Creation_pageState extends State<Lead_Creation_page> {
                 //person name
                 TextFormField(
                   controller: _name,
-                  textInputAction: TextInputAction.next,
+                  // textInputAction: TextInputAction.next,
                   autovalidateMode: AutovalidateMode.onUserInteraction,
                   decoration: const InputDecoration(
                     labelText: 'Lead Name',
@@ -248,7 +259,7 @@ class _Lead_Creation_pageState extends State<Lead_Creation_page> {
                 //person mobile number
                 TextFormField(
                   controller: _mobile,
-                  textInputAction: TextInputAction.next,
+                  // textInputAction: TextInputAction.next,
                   autovalidateMode: AutovalidateMode.onUserInteraction,
                   decoration: const InputDecoration(
                     labelText: 'Mobile',
@@ -304,70 +315,85 @@ class _Lead_Creation_pageState extends State<Lead_Creation_page> {
                 const SizedBox(
                   height: 10,
                 ),
-                //type
-                // Container(
-                //   child: Column(
-                //     crossAxisAlignment: CrossAxisAlignment.stretch,
-                //     children: <Widget>[
-                //       // Text(
-                //       //   '  Cement',
-                //       //   style: TextStyle(fontSize: 13.0),
-                //       // ),
-                //       // const SizedBox(height: 8.0),
-                //       DropdownButtonFormField(
-                //         decoration: const InputDecoration(
-                //           labelText: "Business Type",
-                //           border: OutlineInputBorder(),
-                //         ),
-                //         validator: (value) {
-                //           if (value!.isEmpty) {
-                //             return 'Please select the type';
-                //           }
-                //           return null;
-                //         },
-                //         value: _selecttype,
-                //         items: _typeoptions.map((String option) {
-                //           return DropdownMenuItem(
-                //             value: option,
-                //             child: Text(option),
-                //           );
-                //         }).toList(),
-                //         onChanged: (newValue) {
-                //           setState(() {
-                //             _selecttype = newValue!;
-                //           });
-                //         },
-                //       ),
-                //     ],
+
+                // DropdownButtonFormField<String>(
+                //   autovalidateMode: AutovalidateMode.onUserInteraction,
+                //   value: _selecttype,
+                //   onChanged: (String? newValue) {
+                //     setState(() {
+                //       _selecttype = newValue!;
+                //     });
+                //   },
+                //   items: _typeoptions.map((option) {
+                //     return DropdownMenuItem(
+                //       value: option,
+                //       child: Text(option),
+                //     );
+                //   }).toList(),
+                //   decoration: const InputDecoration(
+                //     // filled: true,
+                //     // labelText: 'Option',
+                //     hintText: 'Business Type',
+                //     border: OutlineInputBorder(),
                 //   ),
+                //   validator: (value) {
+                //     if (value == null) {
+                //       return 'Please select the Business type';
+                //     }
+                //     return null;
+                //   },
                 // ),
-                DropdownButtonFormField<String>(
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  value: _selecttype,
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      _selecttype = newValue!;
-                    });
-                  },
-                  items: _typeoptions.map((option) {
-                    return DropdownMenuItem(
-                      value: option,
-                      child: Text(option),
-                    );
-                  }).toList(),
-                  decoration: const InputDecoration(
-                    // filled: true,
-                    // labelText: 'Option',
-                    hintText: 'Business Type',
-                    border: OutlineInputBorder(),
-                  ),
-                  validator: (value) {
-                    if (value == null) {
-                      return 'Please select the Business type';
-                    }
-                    return null;
-                  },
-                ),
+                TextFormField(
+                    controller: TextEditingController(text: _selecttype),
+
+                    // textInputAction: TextInputAction.,
+
+                    decoration: const InputDecoration(
+                      // filled: true,
+                      // labelText: 'Option',
+                      hintText: 'Business Type',
+                      border: OutlineInputBorder(),
+                      suffixIcon: Icon(Icons.arrow_drop_down_outlined),
+                    ),
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'Please Select the Business Type';
+                      }
+                      return null;
+                    },
+                    readOnly: true,
+                    onTap: () {
+                      showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Text('Business Type'),
+                              content: Container(
+                                width: double.maxFinite,
+                                child: ListView.builder(
+                                  shrinkWrap: true,
+                                  itemCount: _typeoptions.length,
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    return GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          _selecttype = _typeoptions[index];
+                                        });
+                                        Navigator.pop(context);
+                                      },
+                                      child: Container(
+                                        padding:
+                                            EdgeInsets.symmetric(vertical: 10),
+                                        child: Text(_typeoptions[index]),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            );
+                          });
+                    }),
                 const SizedBox(height: 40.0),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
@@ -496,138 +522,170 @@ class _Lead_Creation_pageState extends State<Lead_Creation_page> {
                 const SizedBox(
                   height: 10,
                 ),
-                //cement brand
-                // Container(
-                //   child: Column(
-                //     crossAxisAlignment: CrossAxisAlignment.stretch,
-                //     children: <Widget>[
-                //       // Text(
-                //       //   '  Cement',
-                //       //   style: TextStyle(fontSize: 13.0),
-                //       // ),
 
-                //       DropdownButtonFormField(
-                //         decoration: const InputDecoration(
-                //           labelText: "Select the Cement",
-                //           border: OutlineInputBorder(),
-                //         ),
-                //         validator: (value) {
-                //           if (value!.isEmpty) {
-                //             return 'Please select the Cement';
-                //           }
-                //           return null;
-                //         },
-                //         value: _selectcement,
-                //         items: _cementoptions.map((String option) {
-                //           return DropdownMenuItem(
-                //             value: option,
-                //             child: Text(option),
-                //           );
-                //         }).toList(),
-                //         onChanged: (newValue) {
-                //           setState(() {
-                //             _selectcement = newValue!;
-                //           });
-                //         },
-                //       ),
-                //     ],
+                // DropdownButtonFormField<String>(
+
+                //   autovalidateMode: AutovalidateMode.onUserInteraction,
+                //   value: _selectcement,
+                //   onChanged: (String? newValue) {
+                //     setState(() {
+                //       _selectcement = newValue!;
+                //     });
+                //   },
+                //   decoration: const InputDecoration(
+                //     // filled: true,
+                //     // labelText: 'Option',
+                //     hintText: 'Select the Cement',
+                //     border: OutlineInputBorder(),
                 //   ),
+                //   validator: (value) {
+                //     if (value == null) {
+                //       return 'Please Select the Cement';
+                //     }
+                //     return null;
+                //   },
                 // ),
-                DropdownButtonFormField<String>(
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  value: _selectcement,
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      _selectcement = newValue!;
-                    });
-                  },
-                  items: _cementoptions.map((option) {
-                    return DropdownMenuItem(
-                      value: option,
-                      child: Text(option),
-                    );
-                  }).toList(),
-                  decoration: const InputDecoration(
-                    // filled: true,
-                    // labelText: 'Option',
-                    hintText: 'Select the Cement',
-                    border: OutlineInputBorder(),
-                  ),
-                  validator: (value) {
-                    if (value == null) {
-                      return 'Please Select the Cement';
-                    }
-                    return null;
-                  },
-                ),
+
+                TextFormField(
+                    textInputAction: TextInputAction.next,
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    decoration: const InputDecoration(
+                        // filled: true,
+                        // labelText: 'Option',
+                        hintText: 'Select the Cement',
+                        border: OutlineInputBorder(),
+                        suffixIcon: Icon(Icons.arrow_drop_down_outlined)),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please Select the Cement';
+                      }
+                      return null;
+                    },
+                    readOnly: true,
+                    controller: TextEditingController(text: _selectcement),
+                    onTap: () {
+                      showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Text('Select the Steel'),
+                              content: Container(
+                                width: double.maxFinite,
+                                child: ListView.builder(
+                                  shrinkWrap: true,
+                                  itemCount: _cementoptions.length,
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    return GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          _selectcement =
+                                              _cementoptions[index]['name'];
+                                          cementindex =
+                                              _cementoptions[index]['id'];
+                                        });
+                                        Navigator.pop(context);
+                                      },
+                                      child: Container(
+                                        padding:
+                                            EdgeInsets.symmetric(vertical: 10),
+                                        child:
+                                            Text(_cementoptions[index]['name']),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            );
+                          });
+                    }),
                 //steel brand
                 const SizedBox(
                   height: 10,
                 ),
 
-                // Container(
-                //   child: Column(
-                //     crossAxisAlignment: CrossAxisAlignment.stretch,
-                //     children: <Widget>[
-                //       // Text(
-                //       //   '  Steel',
-                //       //   style: TextStyle(fontSize: 13.0),
-                //       // ),
-
-                //       DropdownButtonFormField(
-                //         validator: (value) {
-                //           if (value!.isEmpty) {
-                //             return 'Please select the Steel';
-                //           }
-                //           return null;
-                //         },
-                //         decoration: const InputDecoration(
-                //           labelText: "Select the Steel",
-                //           border: OutlineInputBorder(),
-                //         ),
-                //         value: _selectsteel,
-                //         items: _steeloptions.map((String option) {
-                //           return DropdownMenuItem(
-                //             value: option,
-                //             child: Text(option),
-                //           );
-                //         }).toList(),
-                //         onChanged: (newValue) {
-                //           setState(() {
-                //             _selectsteel = newValue;
-                //           });
-                //         },
-                //       ),
-                //     ],
+                // DropdownButtonFormField<String>(
+                //   autovalidateMode: AutovalidateMode.onUserInteraction,
+                //   value: _selectsteel,
+                //   onChanged: (String? newValue) {
+                //     setState(() {
+                //       _selectsteel = newValue!;
+                //     });
+                //   },
+                //   items: _steeloptions.map((option) {
+                //     return DropdownMenuItem(
+                //       value: option,
+                //       child: Text(option),
+                //     );
+                //   }).toList(),
+                //   decoration: const InputDecoration(
+                //     // filled: true,
+                //     // labelText: 'Option',
+                //     hintText: 'Select the Steel',
+                //     border: OutlineInputBorder(),
                 //   ),
+                //   validator: (value) {
+                //     if (value == null) {
+                //       return 'Please Select the Steel';
+                //     }
+                //     return null;
+                //   },
                 // ),
-                DropdownButtonFormField<String>(
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  value: _selectsteel,
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      _selectsteel = newValue!;
-                    });
-                  },
-                  items: _steeloptions.map((option) {
-                    return DropdownMenuItem(
-                      value: option,
-                      child: Text(option),
-                    );
-                  }).toList(),
-                  decoration: const InputDecoration(
-                    // filled: true,
-                    // labelText: 'Option',
-                    hintText: 'Select the Steel',
-                    border: OutlineInputBorder(),
-                  ),
-                  validator: (value) {
-                    if (value == null) {
-                      return 'Please Select the Steel';
-                    }
-                    return null;
-                  },
-                ),
+
+                TextFormField(
+                    textInputAction: TextInputAction.next,
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    decoration: const InputDecoration(
+                      // filled: true,
+                      // labelText: 'Option',
+                      hintText: 'Select the Steel',
+                      border: OutlineInputBorder(),
+                      suffixIcon: Icon(Icons.arrow_drop_down_outlined),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please Select the Steel';
+                      }
+                      return null;
+                    },
+                    readOnly: true,
+                    controller: TextEditingController(text: _selectsteel),
+                    onTap: () {
+                      showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Text('Select the Steel'),
+                              content: Container(
+                                width: double.maxFinite,
+                                child: ListView.builder(
+                                  shrinkWrap: true,
+                                  itemCount: _steeloptions.length,
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    return GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          _selectsteel =
+                                              _steeloptions[index]['name'];
+                                          steelindex =
+                                              _steeloptions[index]['id'];
+                                        });
+                                        Navigator.pop(context);
+                                      },
+                                      child: Container(
+                                        padding:
+                                            EdgeInsets.symmetric(vertical: 10),
+                                        child:
+                                            Text(_steeloptions[index]['name']),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            );
+                          });
+                    }),
 
                 const SizedBox(
                   height: 10,
@@ -880,13 +938,14 @@ class _Lead_Creation_pageState extends State<Lead_Creation_page> {
             child: Column(
               children: [
                 const SizedBox(
-                  height: 70,
+                  height: 40,
                 ),
-                const Text(
-                  'Previous Seller Details',
-                  style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+                const Text("Previous Seller Details",
+                    style:
+                        TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold)),
+                const SizedBox(
+                  height: 50,
                 ),
-                const SizedBox(height: 25.0),
                 //name
                 TextFormField(
                   controller: _sellername,
@@ -982,12 +1041,7 @@ class _Lead_Creation_pageState extends State<Lead_Creation_page> {
                     ),
                     GestureDetector(
                       onTap: () {
-                        // submit form dat
-                        // _submit('1', '1');
-                        Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const Follow_Up_Form()));
+                        _submit(cementindex.toString(), steelindex.toString());
                       },
                       child: Container(
                         decoration: BoxDecoration(
@@ -997,14 +1051,14 @@ class _Lead_Creation_pageState extends State<Lead_Creation_page> {
                         height: 46,
                         width: 80,
                         child: _isloading
-                            ? Center(
+                            ? const Center(
                                 child: CircularProgressIndicator(
                                   backgroundColor: Colors.white,
                                   strokeWidth: 2.5,
                                 ),
                               )
-                            : Center(
-                                child: const Text(
+                            : const Center(
+                                child: Text(
                                 'Submit',
                                 style: TextStyle(color: Colors.white),
                               )),

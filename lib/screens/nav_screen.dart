@@ -4,10 +4,6 @@ import 'package:asm_sales_tracker/screens/lead_creationpage.dart';
 import 'package:flutter/material.dart';
 
 class Nav_Screen extends StatefulWidget {
-  Nav_Screen({
-    super.key,
-  });
-
   @override
   _Nav_ScreenState createState() => _Nav_ScreenState();
 }
@@ -39,12 +35,12 @@ class _Nav_ScreenState extends State<Nav_Screen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: PageView(
-        physics: NeverScrollableScrollPhysics(),
+        physics: const NeverScrollableScrollPhysics(),
         controller: _pageController,
         children: <Widget>[
-          Home_Page(),
+          const Home_Page(),
           Lead_Creation_page(),
-          Follow_Up_Page(),
+          const Follow_Up_Page(),
         ],
         onPageChanged: (int index) {
           setState(() {
