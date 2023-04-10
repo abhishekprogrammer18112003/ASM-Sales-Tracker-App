@@ -1,26 +1,25 @@
 import 'dart:convert';
+// import 'dart:ffi';
+import 'package:asm_sales_tracker/screens/follow_up_update.dart';
 import 'package:dio/dio.dart';
-import 'package:asm_sales_tracker/screens/follow_lead_list.dart';
-import 'package:asm_sales_tracker/screens/follow_up_form.dart';
-import 'package:flutter/material.dart';
+
 import 'package:http/http.dart' as http;
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'follow_up_update.dart';
-
-class Follow_Up_Page extends StatefulWidget {
-  const Follow_Up_Page({super.key});
+class Todays_Lead extends StatefulWidget {
+  const Todays_Lead({super.key});
 
   @override
-  State<Follow_Up_Page> createState() => _Follow_Up_PageState();
+  State<Todays_Lead> createState() => _Todays_LeadState();
 }
 
-class _Follow_Up_PageState extends State<Follow_Up_Page> {
+class _Todays_LeadState extends State<Todays_Lead> {
   String? loginenc_id;
   String? phone_number;
 
-  Future<String> getdetails() async {
+  Future<String?> getdetails() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     loginenc_id = prefs.getString("login_enc_id");
@@ -45,7 +44,7 @@ class _Follow_Up_PageState extends State<Follow_Up_Page> {
       'enc_id': loginenc_id,
     });
 
-    String url = "https://asm.sortbe.com/api/Follow-Leads";
+    String url = "https://asm.sortbe.com/api/Today-Leads";
     var response = await Dio().post(url, data: formData);
     var jsonData = response.data;
     print(jsonData);
@@ -73,29 +72,10 @@ class _Follow_Up_PageState extends State<Follow_Up_Page> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        // leading: Icon(Icons.follow_the_signs),
-        automaticallyImplyLeading: false,
-        title: const Text(
-          "Follow-Up's",
-          style: TextStyle(
-            fontSize: 20.0,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+        title: Text("Today's Lead"),
       ),
-      // floatingActionButton: FloatingActionButton(
-      //     child: Icon(Icons.location_history_rounded),
-      //     onPressed: () {
-      //       print(loginenc_id);
-      //       Navigator.push(
-      //           context,
-      //           MaterialPageRoute(
-      //               builder: (context) => Follow_Lead_List_Page(
-      //                     enc_id: loginenc_id,
-      //                   )));
-      //     }),
       body: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10),
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
         child: FutureBuilder(
           future: getleadlist(),
           builder: (context, snapshot) {
@@ -139,32 +119,30 @@ class _Follow_Up_PageState extends State<Follow_Up_Page> {
                           ),
                         ],
                       ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        // crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              IconButton(
-                                icon: Icon(Icons.info),
-                                onPressed: () {
-                                  // Handle info button press
-                                  showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return AlertDialog(
-                                          // title: Text('Business Type'),
-                                          content: Container(
-                                              width: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.7,
-                                              height: 500,
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 10),
+                      child: Padding(
+                        padding: const EdgeInsets.all(1.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          // crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                IconButton(
+                                  icon: Icon(Icons.info),
+                                  onPressed: () {
+                                    // Handle info button press
+                                    showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return AlertDialog(
+                                            // title: Text('Business Type'),
+                                            content: Container(
+                                                width: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.7,
+                                                height: 500,
                                                 child: Column(
                                                   mainAxisAlignment:
                                                       MainAxisAlignment.start,
@@ -175,23 +153,30 @@ class _Follow_Up_PageState extends State<Follow_Up_Page> {
                                                       onTap: () {
                                                         Navigator.pop(context);
                                                       },
-                                                      child: Container(
-                                                        height: 40,
-                                                        width: 40,
-                                                        decoration: BoxDecoration(
-                                                            color:
-                                                                Color.fromARGB(
-                                                                    255,
-                                                                    185,
-                                                                    189,
-                                                                    190),
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        20)),
-                                                        child: Center(
-                                                            child: Icon(Icons
-                                                                .arrow_back)),
+                                                      child: Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Container(
+                                                            height: 40,
+                                                            width: 40,
+                                                            decoration: BoxDecoration(
+                                                                color: Color
+                                                                    .fromARGB(
+                                                                        255,
+                                                                        185,
+                                                                        189,
+                                                                        190),
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            20)),
+                                                            child: Center(
+                                                                child: Icon(Icons
+                                                                    .arrow_back)),
+                                                          ),
+                                                        ],
                                                       ),
                                                     ),
                                                     Center(
@@ -452,51 +437,101 @@ class _Follow_Up_PageState extends State<Follow_Up_Page> {
                                                           ),
                                                         )),
                                                   ],
-                                                ),
-                                              )),
-                                        );
-                                      });
-                                },
-                              ),
-                            ],
-                          ),
-                          Image(
-                              height: MediaQuery.of(context).size.height * 0.1,
-                              image: AssetImage("assets/images/avatar.png")),
-                          SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.016,
-                          ),
-                          Text(
-                            snapshot.data![index]['name'],
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize:
-                                  MediaQuery.of(context).size.height * 0.02,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.016,
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                GestureDetector(
-                                  onTap: () {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                Follow_Up_update(
-                                                    lead_id:
-                                                        snapshot.data![index]
-                                                            ['lead_id'])));
+                                                )),
+                                          );
+                                        });
                                   },
-                                  child: Container(
+                                ),
+                              ],
+                            ),
+                            Image(
+                                height:
+                                    MediaQuery.of(context).size.height * 0.1,
+                                image: AssetImage("assets/images/avatar.png")),
+                            // SizedBox(
+                            //   height:
+                            //       MediaQuery.of(context).size.height * 0.016,
+                            // ),
+                            Text(
+                              snapshot.data![index]['name'],
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize:
+                                    MediaQuery.of(context).size.height * 0.02,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            // SizedBox(
+                            //   height:
+                            //       MediaQuery.of(context).size.height * 0.016,
+                            // ),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {
+                                      print(snapshot.data![index]['lead_id']);
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  Follow_Up_update(
+                                                      lead_id:
+                                                          snapshot.data![index]
+                                                              ['lead_id'])));
+                                    },
+                                    child: Container(
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.25,
+                                        height:
+                                            MediaQuery.of(context).size.height *
+                                                0.05,
+                                        decoration: BoxDecoration(
+                                          color: Color.fromARGB(
+                                              255, 255, 255, 255),
+                                          borderRadius:
+                                              BorderRadius.circular(10.0),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Color.fromARGB(
+                                                      199, 158, 158, 158)
+                                                  .withOpacity(0.3),
+                                              spreadRadius: 2,
+                                              blurRadius: 5,
+                                              offset: Offset(0,
+                                                  3), // changes position of shadow
+                                            ),
+                                          ],
+                                        ),
+                                        child: Center(
+                                          child: Text("Update",
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.w400)),
+                                        )),
+                                  ),
+                                  // SizedBox(
+                                  //   width: 15,
+                                  // ),
+                                  GestureDetector(
+                                    onTap: () async {
+                                      await getmobilenumber();
+                                      final Uri url = Uri(
+                                        scheme: 'tel',
+                                        path: phone_number,
+                                      );
+                                      if (await canLaunchUrl(url)) {
+                                        await launchUrl(url);
+                                      } else {
+                                        print("can't launch this url");
+                                      }
+                                    },
+                                    child: Container(
                                       width: MediaQuery.of(context).size.width *
-                                          0.25,
+                                          0.09,
                                       height:
                                           MediaQuery.of(context).size.height *
                                               0.05,
@@ -517,55 +552,14 @@ class _Follow_Up_PageState extends State<Follow_Up_Page> {
                                           ),
                                         ],
                                       ),
-                                      child: Center(
-                                        child: Text("Update",
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.w400)),
-                                      )),
-                                ),
-                                // SizedBox(
-                                //   width: 15,
-                                // ),
-                                GestureDetector(
-                                  onTap: () async {
-                                    await getmobilenumber();
-                                    final Uri url = Uri(
-                                      scheme: 'tel',
-                                      path: phone_number,
-                                    );
-                                    if (await canLaunchUrl(url)) {
-                                      await launchUrl(url);
-                                    } else {
-                                      print("can't launch this url");
-                                    }
-                                  },
-                                  child: Container(
-                                    width: MediaQuery.of(context).size.width *
-                                        0.09,
-                                    height: MediaQuery.of(context).size.height *
-                                        0.05,
-                                    decoration: BoxDecoration(
-                                      color: Color.fromARGB(255, 255, 255, 255),
-                                      borderRadius: BorderRadius.circular(10.0),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color:
-                                              Color.fromARGB(199, 158, 158, 158)
-                                                  .withOpacity(0.3),
-                                          spreadRadius: 2,
-                                          blurRadius: 5,
-                                          offset: Offset(0,
-                                              3), // changes position of shadow
-                                        ),
-                                      ],
+                                      child: Icon(Icons.phone),
                                     ),
-                                    child: Icon(Icons.phone),
                                   ),
-                                ),
-                              ],
-                            ),
-                          )
-                        ],
+                                ],
+                              ),
+                            )
+                          ],
+                        ),
                       ),
                     ),
                   );

@@ -10,31 +10,36 @@ import 'package:intl/intl.dart' as intl;
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
-class Follow_Up_Form extends StatefulWidget {
-  const Follow_Up_Form({super.key});
+class Follow_Up_update extends StatefulWidget {
+  final String lead_id;
+  // Follow_Up_update({super.key, required lead_id});
+
+  Follow_Up_update({Key? key, required this.lead_id}) : super(key: key);
 
   @override
-  State<Follow_Up_Form> createState() => _Follow_Up_FormState();
+  State<Follow_Up_update> createState() => _Follow_Up_updateState();
 }
 
-class _Follow_Up_FormState extends State<Follow_Up_Form> {
+class _Follow_Up_updateState extends State<Follow_Up_update> {
   final FocusScopeNode _focusScopeNode = FocusScopeNode();
   bool _isloading = false;
   TextEditingController dateinput = TextEditingController();
   String? loginenc_id;
   String? client_id;
+
   //text editing controller for text field
-  void getencid() async {
+  Future<String?> getencid() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     loginenc_id = prefs.getString("login_enc_id");
-    client_id = prefs.getString("client_id");
+    // client_id = prefs.getString("client_id");
+    return loginenc_id;
   }
 
   @override
   void initState() {
     dateinput.text = ""; //set the initial value of text field
     super.initState();
-    getencid();
+    // getencid();
     getfollowstatus();
   }
 
@@ -43,6 +48,11 @@ class _Follow_Up_FormState extends State<Follow_Up_Form> {
       _isloading = true;
     });
     print(dateinput.text.toString());
+    loginenc_id = await getencid();
+    client_id = widget.lead_id.toString();
+    print(loginenc_id);
+    print(client_id);
+
     final response = await http
         .post(Uri.parse('https://asm.sortbe.com/api/Follow-Update'), body: {
       'enc_string': 'HSjLAS82146',
@@ -63,16 +73,29 @@ class _Follow_Up_FormState extends State<Follow_Up_Form> {
         print(data);
         SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.setString("Follow_up_date", dateinput.toString());
-        Navigator.pushReplacement(
-            this.context,
-            MaterialPageRoute(
-                builder: (context) => const Nav_Screen(
-                      initialIndex: 2,
-                    )));
+        // Navigator.pushReplacement(
+        //     this.context,
+        //     MaterialPageRoute(
+        //         builder: (context) => const Nav_Screen(
+        //               initialIndex: 2,
+        //             )));
+        Navigator.pop(context);
       } else {}
     } else {
       // Login failed.
       // You can display an error message here.
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          content: Container(
+            padding: EdgeInsets.all(16),
+            height: 50,
+            decoration: BoxDecoration(
+                color: Color.fromARGB(255, 255, 0, 0),
+                borderRadius: BorderRadius.all(Radius.circular(20))),
+            child: Center(child: Text("Something Went Wrong")),
+          )));
     }
   }
 

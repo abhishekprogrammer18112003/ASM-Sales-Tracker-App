@@ -1,13 +1,19 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:convert';
 import 'dart:io';
+import 'package:dio/dio.dart';
 
+import 'package:http_parser/http_parser.dart';
 import 'package:asm_sales_tracker/screens/follow_up_form.dart';
 import 'package:asm_sales_tracker/screens/follow_up_page.dart';
 import 'package:asm_sales_tracker/screens/nav_screen.dart';
+
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:mime_type/mime_type.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Lead_Creation_page extends StatefulWidget {
@@ -17,6 +23,7 @@ class Lead_Creation_page extends StatefulWidget {
 
 // ignore: camel_case_types
 class _Lead_Creation_pageState extends State<Lead_Creation_page> {
+  final FocusScopeNode _focusScopeNode = FocusScopeNode();
   bool imageselected = false;
 
   final _formKey1 = GlobalKey<FormState>();
@@ -49,10 +56,10 @@ class _Lead_Creation_pageState extends State<Lead_Creation_page> {
   final _brick = TextEditingController();
   final _sand = TextEditingController();
   final _otheritems = TextEditingController();
-  String? loginenc_id;
+  late String loginenc_id;
   void getencid() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    loginenc_id = prefs.getString("login_enc_id");
+    loginenc_id = prefs.getString("login_enc_id")!;
   }
 
   @override
@@ -62,6 +69,8 @@ class _Lead_Creation_pageState extends State<Lead_Creation_page> {
     getencid();
     getsteeldate();
     getcementdate();
+    imageflag = '0';
+    imageselected = false;
   }
 
   String? _selectcement;
@@ -119,6 +128,7 @@ class _Lead_Creation_pageState extends State<Lead_Creation_page> {
   @override
   bool get wantKeepAlive => true;
   File? _image;
+  String imageflag = '0';
   final picker = ImagePicker();
 
   Future getImageFromCamera() async {
@@ -128,8 +138,9 @@ class _Lead_Creation_pageState extends State<Lead_Creation_page> {
         setState(() {
           _image = File(pickedFile.path);
           imageselected = true;
+          imageflag = '1';
         });
-        print(_image!.path);
+        // print(_image.path);
       }
     } on Exception catch (e) {
       print("failed to pick image : $e");
@@ -143,8 +154,9 @@ class _Lead_Creation_pageState extends State<Lead_Creation_page> {
         setState(() {
           _image = File(pickedFile.path);
           imageselected = true;
+          imageflag = '1';
         });
-        print(_image!.path);
+        // print(_image.path);
       }
     } on Exception catch (e) {
       print("failed to pick image : $e");
@@ -153,13 +165,74 @@ class _Lead_Creation_pageState extends State<Lead_Creation_page> {
 
   bool _isloading = false;
 
+  void savedata(String client_id) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString("client_id", client_id.toString());
+    prefs.setString("person_name", _name.text.toString());
+    prefs.setString("person_phone_number", _mobile.text.toString());
+  }
+
+  // Future<Response?> multiPartUpload(File? image) async {
+  //   if (image == null || image.path == null) return null;
+  //   String? fileName = mime(image.path.split(Platform.pathSeparator).last);
+  //   String? mimeType = fileName;
+  //   String? mimee = mimeType?.split('/')[0];
+  //   String? type = mimeType?.split('/')[1];
+
+  //   Dio dio = new Dio();
+  //   dio.options.headers['Content-Type'] = "multipart/form-data";
+  //   FormData formData = FormData.fromMap({
+  //     'project_img': MultipartFile.fromFile(image.path,
+  //         filename: fileName, contentType: MediaType(mimee!, type!))
+  //   });
+  //   Response res = await dio.post('https://asm.sortbe.com/api/Create-Lead',
+  //       data: formData);
+  //   return res;
+  // }
+  // Future<String?> uploadImageHTTP(file, url) async {
+  //   print("upload image http");
+  //   var request = http.MultipartRequest('POST', Uri.parse(url));
+  //   request.files
+  //       .add(await http.MultipartFile.fromPath('project_img', file.path));
+  //   var res = await request.send();
+  //   print(res);
+  //   return res.reasonPhrase;
+  // }
+
   Future<void> _submit(String cement_id, String steel_id) async {
     print("**********************");
     setState(() {
       _isloading = true;
     });
-    final response = await http
-        .post(Uri.parse('https://asm.sortbe.com/api/Create-Lead'), body: {
+    // final response = await http
+    //     .post(Uri.parse('https://asm.sortbe.com/api/Create-Lead'), body: {
+    //   'enc_string': 'HSjLAS82146',
+    // 'name': _name.text.toString(),
+    // 'mobile': _mobile.text.toString(),
+    // 'email': _email.text.toString(),
+    // 'address': _address.text.toString(),
+    // 'gst': _gst.text.toString(),
+    // 'client_type': _selecttype,
+    // 'enc_id': loginenc_id,
+    // 'project_name': _projname.text.toString(),
+    // 'location': _location.text.toString(),
+    // 'sqft': _abuildingsqft.text.toString(),
+    // 'building_type': _typeofbuilding.text.toString(),
+    // 'cement_id': cement_id,
+    // 'steel_id': steel_id,
+    // 'brick': _brick.text.toString(),
+    // 'sand': _sand.text.toString(),
+    // 'other_items': _otheritems.text.toString(),
+    // 'perv_seller_name': _sellername.text.toString(),
+    // 'brand': _brand.text.toString(),
+    // 'pricing': _pricing.text.toString(),
+    // 'prev_seller_address': _selleraddress.text.toString(),
+    // 'prev_seller_contact_no': _sellermobile.text.toString(),
+    // 'project_img_flag': imageflag.toString(),
+    // });
+    Dio dio = Dio();
+
+    FormData formData = FormData.fromMap({
       'enc_string': 'HSjLAS82146',
       'name': _name.text.toString(),
       'mobile': _mobile.text.toString(),
@@ -177,26 +250,55 @@ class _Lead_Creation_pageState extends State<Lead_Creation_page> {
       'brick': _brick.text.toString(),
       'sand': _sand.text.toString(),
       'other_items': _otheritems.text.toString(),
-      'perv_seller_name': _sellername.text.toString(),
+      'prev_seller_name': _sellername.text.toString(),
       'brand': _brand.text.toString(),
       'pricing': _pricing.text.toString(),
       'prev_seller_address': _selleraddress.text.toString(),
       'prev_seller_contact_no': _sellermobile.text.toString(),
+      'project_img_flag': imageflag.toString(),
+      'project_img':
+          imageselected ? await MultipartFile.fromFile(_image!.path) : null,
+      // if(imageflag == '1'){
+      //    'project_img':
+      // }
+
+      // imageflag == '1' ? await MultipartFile.fromFile(_image!.path) : ,
     });
+    print(_sellername.text.toString());
+    print(_brand.text.toString());
+    print(_pricing.text.toString());
+    print(_selleraddress.text.toString());
+    print(_sellermobile.text.toString());
+
+    //
+    // multiPartUpload(_image);
+    // print(_image!.path);
+
+    String url = "https://asm.sortbe.com/api/Create-Lead";
+    var response = await Dio().post(url, data: formData);
+    var data = response.data;
+    print(data);
+
     print("*************************************");
-    var data = jsonDecode(response.body.toString());
+
     setState(() {
       _isloading = false;
     });
-    print(data);
+    // await uploadImageHTTP(_image, "https://asm.sortbe.com/api/Create-Lead");
+
     if (response.statusCode == 200) {
       print("*****************");
+      print(data);
       // Login successful.
       // You can save the user's session token or navigate to the next screen here.
       if (data['status'] == 'Success') {
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => Nav_Screen()));
-      } else {}
+        print("next page");
+        savedata(data['client_id'].toString());
+        Navigator.pushReplacement(context,
+            MaterialPageRoute(builder: ((context) => const Follow_Up_Form())));
+      } else {
+        print("something went wrong");
+      }
     } else {
       // Login failed.
       // You can display an error message here.
@@ -219,211 +321,214 @@ class _Lead_Creation_pageState extends State<Lead_Creation_page> {
       onTap: () {
         FocusScope.of(context).unfocus();
       },
-      child: Form(
-        key: _formKey1,
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                const SizedBox(
-                  height: 40,
-                ),
-                const Text("Lead Details",
-                    style:
-                        TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold)),
-                const SizedBox(
-                  height: 50,
-                ),
-                //person name
-                TextFormField(
-                  controller: _name,
-                  // textInputAction: TextInputAction.next,
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  decoration: const InputDecoration(
-                    labelText: 'Lead Name',
-                    border: OutlineInputBorder(),
+      child: FocusScope(
+        node: _focusScopeNode,
+        child: Form(
+          key: _formKey1,
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  const SizedBox(
+                    height: 40,
                   ),
-                  validator: (value) {
-                    //
-                    if (value == null || value.isEmpty) {
-                      return "Enter lead name";
-                    }
-                    return null;
-                  },
-                  keyboardType: TextInputType.name,
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                //person mobile number
-                TextFormField(
-                  controller: _mobile,
-                  // textInputAction: TextInputAction.next,
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  decoration: const InputDecoration(
-                    labelText: 'Mobile',
-                    border: OutlineInputBorder(),
+                  const Text("Lead Details",
+                      style: TextStyle(
+                          fontSize: 25.0, fontWeight: FontWeight.bold)),
+                  const SizedBox(
+                    height: 50,
                   ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your Mobile Number';
-                    }
-                    if (value.length != 10) {
-                      return 'Please enter your correct mobile number';
-                    }
-                    return null;
-                  },
-                  keyboardType: TextInputType.number,
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                //email
-                TextFormField(
-                  controller: _email,
-                  decoration: const InputDecoration(
-                    labelText: 'Email (optional)',
-                    border: OutlineInputBorder(),
-                  ),
-                  keyboardType: TextInputType.emailAddress,
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                //address
-                TextFormField(
-                  controller: _address,
-                  decoration: const InputDecoration(
-                    labelText: 'Address (optional)',
-                    border: OutlineInputBorder(),
-                  ),
-                  keyboardType: TextInputType.text,
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                //gst
-                TextFormField(
-                  controller: _gst,
-                  decoration: const InputDecoration(
-                    labelText: 'GST (optional)',
-                    border: OutlineInputBorder(),
-                  ),
-                  keyboardType: TextInputType.text,
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-
-                // DropdownButtonFormField<String>(
-                //   autovalidateMode: AutovalidateMode.onUserInteraction,
-                //   value: _selecttype,
-                //   onChanged: (String? newValue) {
-                //     setState(() {
-                //       _selecttype = newValue!;
-                //     });
-                //   },
-                //   items: _typeoptions.map((option) {
-                //     return DropdownMenuItem(
-                //       value: option,
-                //       child: Text(option),
-                //     );
-                //   }).toList(),
-                //   decoration: const InputDecoration(
-                //     // filled: true,
-                //     // labelText: 'Option',
-                //     hintText: 'Business Type',
-                //     border: OutlineInputBorder(),
-                //   ),
-                //   validator: (value) {
-                //     if (value == null) {
-                //       return 'Please select the Business type';
-                //     }
-                //     return null;
-                //   },
-                // ),
-                TextFormField(
-                    controller: TextEditingController(text: _selecttype),
-
-                    // textInputAction: TextInputAction.,
-
+                  //person name
+                  TextFormField(
+                    controller: _name,
+                    // textInputAction: TextInputAction.next,
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
                     decoration: const InputDecoration(
-                      // filled: true,
-                      // labelText: 'Option',
-                      hintText: 'Business Type',
+                      labelText: 'Lead Name',
                       border: OutlineInputBorder(),
-                      suffixIcon: Icon(Icons.arrow_drop_down_outlined),
                     ),
                     validator: (value) {
-                      if (value!.isEmpty) {
-                        return 'Please Select the Business Type';
+                      //
+                      if (value == null || value.isEmpty) {
+                        return "Enter lead name";
                       }
                       return null;
                     },
-                    readOnly: true,
-                    onTap: () {
-                      showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: Text('Business Type'),
-                              content: Container(
-                                width: double.maxFinite,
-                                child: ListView.builder(
-                                  shrinkWrap: true,
-                                  itemCount: _typeoptions.length,
-                                  itemBuilder:
-                                      (BuildContext context, int index) {
-                                    return GestureDetector(
-                                      onTap: () {
-                                        setState(() {
-                                          _selecttype = _typeoptions[index];
-                                        });
-                                        Navigator.pop(context);
-                                      },
-                                      child: Container(
-                                        padding:
-                                            EdgeInsets.symmetric(vertical: 10),
-                                        child: Text(_typeoptions[index]),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ),
-                            );
-                          });
-                    }),
-                const SizedBox(height: 40.0),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    GestureDetector(
-                      child: Container(
-                          height: 46,
-                          width: 80,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(6),
-                            color: Colors.blue,
-                          ),
-                          child: const Center(
-                            child: Text("Next",
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 17)),
-                          )),
-                      onTap: () {
-                        if (_formKey1.currentState!.validate()) {
-                          _currentPageIndex++;
-                          _pageController.nextPage(
-                            duration: const Duration(milliseconds: 300),
-                            curve: Curves.easeInOut,
-                          );
-                        }
-                      },
+                    keyboardType: TextInputType.name,
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  //person mobile number
+                  TextFormField(
+                    controller: _mobile,
+                    // textInputAction: TextInputAction.next,
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    decoration: const InputDecoration(
+                      labelText: 'Mobile',
+                      border: OutlineInputBorder(),
                     ),
-                  ],
-                ),
-              ],
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your Mobile Number';
+                      }
+                      if (value.length != 10) {
+                        return 'Please enter your correct mobile number';
+                      }
+                      return null;
+                    },
+                    keyboardType: TextInputType.number,
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  //email
+                  TextFormField(
+                    controller: _email,
+                    decoration: const InputDecoration(
+                      labelText: 'Email (optional)',
+                      border: OutlineInputBorder(),
+                    ),
+                    keyboardType: TextInputType.emailAddress,
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  //address
+                  TextFormField(
+                    controller: _address,
+                    decoration: const InputDecoration(
+                      labelText: 'Address (optional)',
+                      border: OutlineInputBorder(),
+                    ),
+                    keyboardType: TextInputType.text,
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  //gst
+                  TextFormField(
+                    controller: _gst,
+                    decoration: const InputDecoration(
+                      labelText: 'GST (optional)',
+                      border: OutlineInputBorder(),
+                    ),
+                    keyboardType: TextInputType.text,
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+
+                  // DropdownButtonFormField<String>(
+                  //   autovalidateMode: AutovalidateMode.onUserInteraction,
+                  //   value: _selecttype,
+                  //   onChanged: (String? newValue) {
+                  //     setState(() {
+                  //       _selecttype = newValue!;
+                  //     });
+                  //   },
+                  //   items: _typeoptions.map((option) {
+                  //     return DropdownMenuItem(
+                  //       value: option,
+                  //       child: Text(option),
+                  //     );
+                  //   }).toList(),
+                  //   decoration: const InputDecoration(
+                  //     // filled: true,
+                  //     // labelText: 'Option',
+                  //     hintText: 'Business Type',
+                  //     border: OutlineInputBorder(),
+                  //   ),
+                  //   validator: (value) {
+                  //     if (value == null) {
+                  //       return 'Please select the Business type';
+                  //     }
+                  //     return null;
+                  //   },
+                  // ),
+                  TextFormField(
+                      controller: TextEditingController(text: _selecttype),
+
+                      // textInputAction: TextInputAction.,
+
+                      decoration: const InputDecoration(
+                        // filled: true,
+                        // labelText: 'Option',
+                        hintText: 'Business Type',
+                        border: OutlineInputBorder(),
+                        suffixIcon: Icon(Icons.arrow_drop_down_outlined),
+                      ),
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return 'Please Select the Business Type';
+                        }
+                        return null;
+                      },
+                      readOnly: true,
+                      onTap: () {
+                        showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: Text('Business Type'),
+                                content: Container(
+                                  width: double.maxFinite,
+                                  child: ListView.builder(
+                                    shrinkWrap: true,
+                                    itemCount: _typeoptions.length,
+                                    itemBuilder:
+                                        (BuildContext context, int index) {
+                                      return GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            _selecttype = _typeoptions[index];
+                                          });
+                                          Navigator.pop(context);
+                                        },
+                                        child: Container(
+                                          padding: EdgeInsets.symmetric(
+                                              vertical: 10),
+                                          child: Text(_typeoptions[index]),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              );
+                            });
+                      }),
+                  const SizedBox(height: 40.0),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      GestureDetector(
+                        child: Container(
+                            height: 46,
+                            width: 80,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(6),
+                              color: Colors.blue,
+                            ),
+                            child: const Center(
+                              child: Text("Next",
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 17)),
+                            )),
+                        onTap: () {
+                          if (_formKey1.currentState!.validate()) {
+                            _currentPageIndex++;
+                            _pageController.nextPage(
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeInOut,
+                            );
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -568,7 +673,7 @@ class _Lead_Creation_pageState extends State<Lead_Creation_page> {
                           context: context,
                           builder: (BuildContext context) {
                             return AlertDialog(
-                              title: Text('Select the Steel'),
+                              title: Text('Select the Cement'),
                               content: Container(
                                 width: double.maxFinite,
                                 child: ListView.builder(
@@ -983,7 +1088,7 @@ class _Lead_Creation_pageState extends State<Lead_Creation_page> {
                     border: OutlineInputBorder(),
                   ),
 
-                  keyboardType: TextInputType.text,
+                  keyboardType: TextInputType.phone,
                 ),
                 const SizedBox(
                   height: 10,

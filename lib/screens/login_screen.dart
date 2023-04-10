@@ -14,6 +14,7 @@ class Login_Screen extends StatefulWidget {
 }
 
 class _Login_ScreenState extends State<Login_Screen> {
+  final FocusScopeNode _focusScopeNode = FocusScopeNode();
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _mobileController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -46,113 +47,150 @@ class _Login_ScreenState extends State<Login_Screen> {
         prefs.setBool('login_islogin', true);
         Navigator.pushReplacement(
             context, MaterialPageRoute(builder: (context) => Nav_Screen()));
-      } else {}
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            content: Container(
+              padding: EdgeInsets.all(16),
+              height: 50,
+              decoration: BoxDecoration(
+                  color: Color.fromARGB(255, 255, 0, 0),
+                  borderRadius: BorderRadius.all(Radius.circular(20))),
+              child: Center(child: Text("User Not Found")),
+            )));
+      }
     } else {
       // Login failed.
       // You can display an error message here.
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          content: Container(
+            padding: EdgeInsets.all(16),
+            height: 90,
+            decoration: BoxDecoration(
+                color: Color.fromARGB(255, 255, 0, 0),
+                borderRadius: BorderRadius.all(Radius.circular(20))),
+            child: Text("Login Failed"),
+          )));
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      // appBar: AppBar(
-      //   title: Text('Login'),
-      // ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.1,
-                ),
-                Container(
-                  height: 250,
-                  width: 250,
-                  child: Image.asset("assets/images/asmbgremove.png"),
-                ),
-                const Text(
-                  "Login",
-                  style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Color.fromARGB(171, 0, 0, 0)),
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                TextFormField(
-                  controller: _mobileController,
-                  keyboardType: TextInputType.phone,
-                  decoration: const InputDecoration(
-                    labelText: 'Mobile',
-                    border: OutlineInputBorder(),
-                  ),
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return 'Please enter your Mobile Number';
-                    }
-                    if (value.length != 10) {
-                      return 'Please enter the correct Mobile Number';
-                    }
-                    // You can add more email validation rules here.
-                    return null;
-                  },
-                ),
-                SizedBox(height: 16.0),
-                TextFormField(
-                  controller: _passwordController,
-                  obscureText: !_showPassword,
-                  decoration: InputDecoration(
-                    labelText: 'Password',
-                    border: OutlineInputBorder(),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _showPassword ? Icons.visibility : Icons.visibility_off,
+    return GestureDetector(
+      onTap: () {
+        if (_focusScopeNode.hasFocus) {
+          _focusScopeNode.unfocus();
+        }
+      },
+      child: Scaffold(
+        // appBar: AppBar(
+        //   title: Text('Login'),
+        // ),
+        body: FocusScope(
+          node: _focusScopeNode,
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: <Widget>[
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.1,
+                    ),
+                    Container(
+                      height: 250,
+                      width: 250,
+                      child: Image.asset("assets/images/asmbgremove.png"),
+                    ),
+                    const Text(
+                      "Login",
+                      style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Color.fromARGB(171, 0, 0, 0)),
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    TextFormField(
+                      controller: _mobileController,
+                      keyboardType: TextInputType.phone,
+                      decoration: const InputDecoration(
+                        labelText: 'Mobile',
+                        border: OutlineInputBorder(),
                       ),
-                      onPressed: () {
-                        setState(() {
-                          _showPassword = !_showPassword;
-                        });
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return 'Please enter your Mobile Number';
+                        }
+                        if (value.length != 10) {
+                          return 'Please enter the correct Mobile Number';
+                        }
+                        // You can add more email validation rules here.
+                        return null;
                       },
                     ),
-                  ),
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return 'Please enter your password';
-                    }
-                    // You can add more password validation rules here.
-                    return null;
-                  },
-                ),
-                SizedBox(height: 32.0),
-                SizedBox(
-                  height: 50,
-                  width: 140,
-                  child: ElevatedButton(
-                    child: _isloading
-                        ? Center(
-                            child: CircularProgressIndicator(
-                            color: Colors.white,
-                          ))
-                        : Text('Login'),
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        // Perform login here.
-                        // You can use _emailController.text and _passwordController.text to get the user's input.
-                        // If the login is successful, you can navigate to the next screen.
+                    SizedBox(height: 16.0),
+                    TextFormField(
+                      controller: _passwordController,
+                      obscureText: !_showPassword,
+                      decoration: InputDecoration(
+                        labelText: 'Password',
+                        border: OutlineInputBorder(),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _showPassword
+                                ? Icons.visibility
+                                : Icons.visibility_off,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _showPassword = !_showPassword;
+                            });
+                          },
+                        ),
+                      ),
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return 'Please enter your password';
+                        }
+                        // You can add more password validation rules here.
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: 32.0),
+                    SizedBox(
+                      height: 50,
+                      width: 140,
+                      child: ElevatedButton(
+                        child: _isloading
+                            ? Center(
+                                child: CircularProgressIndicator(
+                                color: Colors.white,
+                              ))
+                            : Text('Login'),
+                        onPressed: () {
+                          if (_formKey.currentState!.validate()) {
+                            // Perform login here.
+                            // You can use _emailController.text and _passwordController.text to get the user's input.
+                            // If the login is successful, you can navigate to the next screen.
 
-                        _login(_mobileController.text.toString(),
-                            _passwordController.text.toString());
-                      }
-                    },
-                  ),
+                            _login(_mobileController.text.toString(),
+                                _passwordController.text.toString());
+                          }
+                        },
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         ),
