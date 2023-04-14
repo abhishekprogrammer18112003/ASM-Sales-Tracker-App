@@ -1,7 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'package:asm_sales_tracker/screens/closeleadfollowup.dart';
+import 'package:asm_sales_tracker/screens/closeleadtoday.dart';
+import 'package:asm_sales_tracker/screens/today_lead.dart';
 import 'package:dio/dio.dart';
 
 import 'package:asm_sales_tracker/screens/follow_up_page.dart';
@@ -12,24 +13,26 @@ import 'package:intl/intl.dart' as intl;
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
-class Follow_Up_update extends StatefulWidget {
+import 'closeleadfollowup.dart';
+
+class Follow_Up_update_todays extends StatefulWidget {
   final String lead_id;
   // Follow_Up_update({super.key, required lead_id});
 
-  Follow_Up_update({Key? key, required this.lead_id}) : super(key: key);
+  Follow_Up_update_todays({Key? key, required this.lead_id}) : super(key: key);
 
   @override
-  State<Follow_Up_update> createState() => _Follow_Up_updateState();
+  State<Follow_Up_update_todays> createState() =>
+      _Follow_Up_update_todaysState();
 }
 
-class _Follow_Up_updateState extends State<Follow_Up_update> {
+class _Follow_Up_update_todaysState extends State<Follow_Up_update_todays> {
   final FocusScopeNode _focusScopeNode = FocusScopeNode();
   bool _isloading = false;
   TextEditingController dateinput = TextEditingController();
   TextEditingController _closereason = TextEditingController();
   String? loginenc_id;
   String? client_id;
-  bool _isloading1 = false;
 
   //text editing controller for text field
   Future<String?> getencid() async {
@@ -85,7 +88,7 @@ class _Follow_Up_updateState extends State<Follow_Up_update> {
         //               initialIndex: 2,
         //             )));
         Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => Follow_Up_Page()));
+            context, MaterialPageRoute(builder: (context) => Todays_Lead()));
         // Navigator.push(
         //   context,
         //   MaterialPageRoute(builder: (context) => Follow_Up_Page()),
@@ -311,7 +314,7 @@ class _Follow_Up_updateState extends State<Follow_Up_update> {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => closeleadfollowup(
+                                    builder: (context) => closeleadtoday(
                                         lead_id: client_id.toString())));
                           },
                           child: Container(

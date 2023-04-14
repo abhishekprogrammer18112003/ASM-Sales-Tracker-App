@@ -4,7 +4,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:dio/dio.dart';
 
-import 'package:http_parser/http_parser.dart';
 import 'package:asm_sales_tracker/screens/follow_up_form.dart';
 import 'package:asm_sales_tracker/screens/follow_up_page.dart';
 import 'package:asm_sales_tracker/screens/nav_screen.dart';
@@ -297,9 +296,39 @@ class _Lead_Creation_pageState extends State<Lead_Creation_page> {
         Navigator.pushReplacement(context,
             MaterialPageRoute(builder: ((context) => const Follow_Up_Form())));
       } else {
-        print("something went wrong");
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            content: Container(
+              padding: EdgeInsets.all(16),
+              height: 50,
+              decoration: BoxDecoration(
+                  color: Color.fromARGB(255, 255, 0, 0),
+                  borderRadius: BorderRadius.all(Radius.circular(20))),
+              child: Center(child: Text("Something Went Wrong")),
+            )));
+        setState(() {
+          _isloading = false;
+        });
       }
     } else {
+      setState(() {
+        _isloading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          content: Container(
+            padding: EdgeInsets.all(16),
+            height: 50,
+            decoration: BoxDecoration(
+                color: Color.fromARGB(255, 255, 0, 0),
+                borderRadius: BorderRadius.all(Radius.circular(20))),
+            child: Center(child: Text("Please Try again")),
+          )));
+
       // Login failed.
       // You can display an error message here.
     }
@@ -471,7 +500,10 @@ class _Lead_Creation_pageState extends State<Lead_Creation_page> {
                             context: context,
                             builder: (BuildContext context) {
                               return AlertDialog(
-                                title: Text('Business Type'),
+                                title: Text(
+                                  'Business Type',
+                                  style: TextStyle(fontWeight: FontWeight.w700),
+                                ),
                                 content: Container(
                                   width: double.maxFinite,
                                   child: ListView.builder(
@@ -486,10 +518,16 @@ class _Lead_Creation_pageState extends State<Lead_Creation_page> {
                                           });
                                           Navigator.pop(context);
                                         },
-                                        child: Container(
-                                          padding: EdgeInsets.symmetric(
-                                              vertical: 10),
-                                          child: Text(_typeoptions[index]),
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(4.0),
+                                          child: Container(
+                                            padding: EdgeInsets.symmetric(
+                                                vertical: 10),
+                                            child: Text(_typeoptions[index],
+                                                style: TextStyle(
+                                                  fontSize: 16,
+                                                )),
+                                          ),
                                         ),
                                       );
                                     },
@@ -673,7 +711,9 @@ class _Lead_Creation_pageState extends State<Lead_Creation_page> {
                           context: context,
                           builder: (BuildContext context) {
                             return AlertDialog(
-                              title: Text('Select the Cement'),
+                              title: Text('Select the Cement',
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.w700)),
                               content: Container(
                                 width: double.maxFinite,
                                 child: ListView.builder(
@@ -760,7 +800,9 @@ class _Lead_Creation_pageState extends State<Lead_Creation_page> {
                           context: context,
                           builder: (BuildContext context) {
                             return AlertDialog(
-                              title: Text('Select the Steel'),
+                              title: Text('Select the Steel',
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.w700)),
                               content: Container(
                                 width: double.maxFinite,
                                 child: ListView.builder(

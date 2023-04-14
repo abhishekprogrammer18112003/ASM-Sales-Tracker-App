@@ -27,6 +27,7 @@ class _Home_PageState extends State<Home_Page> {
 
   String? todayscount = '0';
   String? follow_up_count = '0';
+  List<dynamic> _dashboard = [];
   Future<String?> getleadlist() async {
     print('****************************');
 
@@ -43,8 +44,13 @@ class _Home_PageState extends State<Home_Page> {
     print(jsonData);
 
     if (response.statusCode == 200) {
+      // if(jsonData['today_count'] != '0'){
+      //   todayscount = jsonData['today_count'];
+      //   follow_up_count = jsonData['follow_count'];
+      // }
       print("done lead list");
       print(loginenc_id.toString());
+
       todayscount = jsonData['today_count'];
       follow_up_count = jsonData['follow_count'];
 
@@ -60,12 +66,23 @@ class _Home_PageState extends State<Home_Page> {
     // TODO: implement initState
     super.initState();
     getdetails();
+    getleadlist();
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          flexibleSpace: Container(
+            decoration: const BoxDecoration(
+                gradient: LinearGradient(colors: [
+              Color.fromARGB(255, 66, 190, 221),
+              Color.fromARGB(255, 64, 162, 207),
+              Color.fromARGB(255, 0, 162, 255),
+              Color.fromARGB(255, 0, 119, 255)
+            ])),
+          ),
           // leading: Icon(Icons.construction),
           automaticallyImplyLeading: false,
           title: Text('Dashboard'),
@@ -78,6 +95,7 @@ class _Home_PageState extends State<Home_Page> {
                 child: CircularProgressIndicator(),
               );
             }
+
             return Column(
               children: [
                 SizedBox(
@@ -85,67 +103,23 @@ class _Home_PageState extends State<Home_Page> {
                 ),
                 GestureDetector(
                   onTap: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => Todays_Lead()));
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: Container(
-                      width: double.infinity,
-                      height: 120.0,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(10.0),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Color.fromARGB(199, 158, 158, 158)
-                                .withOpacity(0.3),
-                            spreadRadius: 2,
-                            blurRadius: 5,
-                            offset: Offset(0, 3), // changes position of shadow
-                          ),
-                        ],
-                      ),
-                      child: Center(
-                          child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "Today's Lead",
-                            style: TextStyle(
-                                fontSize: 20.0, fontWeight: FontWeight.bold),
-                          ),
-                          SizedBox(width: 20),
-                          CircleAvatar(
-                            maxRadius: 20,
-                            child: Text(
-                              todayscount.toString(),
-                              style: TextStyle(
-                                  fontSize: 20.0, fontWeight: FontWeight.bold),
-                            ),
-                          )
-                        ],
-                      )),
-                    ),
-                  ),
-                ),
-                GestureDetector(
-                  onTap: () {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => Nav_Screen(
-                                  initialIndex: 2,
-                                )));
+                            builder: (context) => Todays_Lead())).then((value) {
+                      setState(() {
+                        // Call setState to refresh the page.
+                      });
+                    });
                   },
                   child: Padding(
                     padding: const EdgeInsets.all(10.0),
                     child: Container(
                       width: double.infinity,
-                      height: 150.0,
+                      height: 170.0,
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(10.0),
+                        borderRadius: BorderRadius.circular(15.0),
                         boxShadow: [
                           BoxShadow(
                             color: Color.fromARGB(199, 158, 158, 158)
@@ -157,25 +131,62 @@ class _Home_PageState extends State<Home_Page> {
                         ],
                       ),
                       child: Center(
-                          child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "Total Follow-Up\nLeads",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                fontSize: 20.0, fontWeight: FontWeight.bold),
-                          ),
-                          SizedBox(width: 20),
-                          CircleAvatar(
-                            maxRadius: 20,
-                            child: Text(
-                              follow_up_count.toString(),
+                          child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 15.0, vertical: 8),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              "Today's Follow-Up Leads",
                               style: TextStyle(
-                                  fontSize: 20.0, fontWeight: FontWeight.bold),
+                                  fontSize: 25.0, fontWeight: FontWeight.bold),
                             ),
-                          )
-                        ],
+                            SizedBox(height: 9),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Text(
+                                  todayscount.toString(),
+                                  style: TextStyle(
+                                      fontSize: 35.0,
+                                      fontWeight: FontWeight.w700,
+                                      color: Colors.grey),
+                                ),
+                                Text(
+                                  "/${follow_up_count.toString()}",
+                                  style: TextStyle(
+                                      fontSize: 30.0,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.grey),
+                                )
+                              ],
+                            ),
+                            SizedBox(height: 8),
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: LinearProgressIndicator(
+                                minHeight: 15,
+
+                                value: double.parse(
+                                            follow_up_count.toString()) !=
+                                        0
+                                    ? (double.parse(todayscount.toString())) /
+                                        double.parse(follow_up_count.toString())
+                                    : 1 / 1,
+                                // backgroundColor:
+                                //     Color.fromARGB(255, 130, 206, 224)),
+                              ),
+                            ),
+                            SizedBox(
+                              height: 8,
+                            ),
+                            Text("Try completing all Follow-Up ",
+                                style: TextStyle(fontWeight: FontWeight.w500)),
+                            SizedBox(height: 3),
+                          ],
+                        ),
                       )),
                     ),
                   ),
