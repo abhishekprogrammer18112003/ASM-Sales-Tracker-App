@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:asm_sales_tracker/screens/home_page.dart';
 import 'package:asm_sales_tracker/screens/today_lead.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -77,8 +78,13 @@ class _closeleadtodayState extends State<closeleadtoday> {
         setState(() {
           _isloading1 = false;
         });
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => Todays_Lead()));
+        Navigator.pop(context);
+        // Navigator.pushReplacement(
+        //     context,
+        //     MaterialPageRoute(
+        //         builder: (context) => Todays_Lead(
+        //             // initialIndex: 0,
+        //             )));
         // Navigator.push(
         //   context,
         //   MaterialPageRoute(builder: (context) => Follow_Up_Page()),
@@ -189,10 +195,14 @@ class _closeleadtodayState extends State<closeleadtoday> {
                             height: 46,
                             width: 85,
                             child: _isloading1
-                                ? const Center(
-                                    child: CircularProgressIndicator(
-                                      backgroundColor: Colors.white,
-                                      strokeWidth: 2.5,
+                                ? Center(
+                                    child: Container(
+                                      height: 25,
+                                      width: 25,
+                                      child: CircularProgressIndicator(
+                                        backgroundColor: Colors.white,
+                                        strokeWidth: 3,
+                                      ),
                                     ),
                                   )
                                 : const Center(

@@ -87,12 +87,14 @@ class _Follow_Up_update_todaysState extends State<Follow_Up_update_todays> {
         //         builder: (context) => const Nav_Screen(
         //               initialIndex: 2,
         //             )));
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => Todays_Lead()));
-        // Navigator.push(
-        //   context,
-        //   MaterialPageRoute(builder: (context) => Follow_Up_Page()),
-        // ).then((value) => setState(() {}));
+        // Navigator.pushReplacement(
+        //     context,
+        //     MaterialPageRoute(
+        //         builder: (context) => Nav_Screen(
+        //               initialIndex: 0,
+        //             )));
+
+        Navigator.pop(context);
       } else {}
     } else {
       // Login failed.
@@ -312,10 +314,13 @@ class _Follow_Up_update_todaysState extends State<Follow_Up_update_todays> {
                             client_id = widget.lead_id.toString();
                             print(client_id);
                             Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => closeleadtoday(
-                                        lead_id: client_id.toString())));
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => closeleadtoday(
+                                            lead_id: client_id.toString())))
+                                .then((value) {
+                              Navigator.pop(context);
+                            });
                           },
                           child: Container(
                             decoration: BoxDecoration(
@@ -346,10 +351,14 @@ class _Follow_Up_update_todaysState extends State<Follow_Up_update_todays> {
                             height: 46,
                             width: 80,
                             child: _isloading
-                                ? const Center(
-                                    child: CircularProgressIndicator(
-                                      backgroundColor: Colors.white,
-                                      strokeWidth: 2.5,
+                                ? Center(
+                                    child: Container(
+                                      height: 22,
+                                      width: 22,
+                                      child: CircularProgressIndicator(
+                                        backgroundColor: Colors.white,
+                                        strokeWidth: 3,
+                                      ),
                                     ),
                                   )
                                 : const Center(

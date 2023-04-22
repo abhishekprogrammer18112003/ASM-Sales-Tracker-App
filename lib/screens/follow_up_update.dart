@@ -84,8 +84,8 @@ class _Follow_Up_updateState extends State<Follow_Up_update> {
         //         builder: (context) => const Nav_Screen(
         //               initialIndex: 2,
         //             )));
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => Follow_Up_Page()));
+        print("hello ");
+        Navigator.pop(context);
         // Navigator.push(
         //   context,
         //   MaterialPageRoute(builder: (context) => Follow_Up_Page()),
@@ -309,10 +309,13 @@ class _Follow_Up_updateState extends State<Follow_Up_update> {
                             client_id = widget.lead_id.toString();
                             print(client_id);
                             Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => closeleadfollowup(
-                                        lead_id: client_id.toString())));
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => closeleadfollowup(
+                                            lead_id: client_id.toString())))
+                                .then((value) {
+                              Navigator.pop(context);
+                            });
                           },
                           child: Container(
                             decoration: BoxDecoration(
@@ -343,10 +346,14 @@ class _Follow_Up_updateState extends State<Follow_Up_update> {
                             height: 46,
                             width: 80,
                             child: _isloading
-                                ? const Center(
-                                    child: CircularProgressIndicator(
-                                      backgroundColor: Colors.white,
-                                      strokeWidth: 2.5,
+                                ? Center(
+                                    child: Container(
+                                      height: 22,
+                                      width: 22,
+                                      child: CircularProgressIndicator(
+                                        backgroundColor: Colors.white,
+                                        strokeWidth: 2.5,
+                                      ),
                                     ),
                                   )
                                 : const Center(

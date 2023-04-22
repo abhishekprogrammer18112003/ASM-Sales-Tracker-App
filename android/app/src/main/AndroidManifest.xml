@@ -1,10 +1,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.abhion.asm_sales_tracker">
      <uses-permission android:name="android.permission.INTERNET"/>
+     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
    <application
         android:label="ASM Sales Tracker"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon">
+        <uses-library android:name="org.apache.http.legacy" android:required="false"/>
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -20,6 +22,10 @@
             <meta-data
               android:name="io.flutter.embedding.android.NormalTheme"
               android:resource="@style/NormalTheme"
+              />
+              <meta-data
+              android:name="com.google.android.gms.version"
+              android:value="@integer/google_play_services_version"
               />
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>

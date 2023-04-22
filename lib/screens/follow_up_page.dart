@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:asm_sales_tracker/screens/nav_screen.dart';
 import 'package:dio/dio.dart';
 import 'package:asm_sales_tracker/screens/follow_lead_list.dart';
 import 'package:asm_sales_tracker/screens/follow_up_form.dart';
@@ -28,37 +29,37 @@ class _Follow_Up_PageState extends State<Follow_Up_Page> {
     return loginenc_id!;
   }
 
-  Future<String?> getfollowcount() async {
-    print('****************************');
+  // Future<String?> getfollowcount() async {
+  //   print('****************************');
 
-    loginenc_id = await getdetails() as String?;
-    print(loginenc_id.toString());
-    FormData formData = FormData.fromMap({
-      'enc_string': 'HSjLAS82146',
-      'enc_id': loginenc_id,
-    });
+  //   loginenc_id = await getdetails() as String?;
+  //   print(loginenc_id.toString());
+  //   FormData formData = FormData.fromMap({
+  //     'enc_string': 'HSjLAS82146',
+  //     'enc_id': loginenc_id,
+  //   });
 
-    String url = "https://asm.sortbe.com/api/Dashboard-Data";
-    var response = await Dio().post(url, data: formData);
-    var jsonData = response.data;
-    print(jsonData);
+  //   String url = "https://asm.sortbe.com/api/Follow-Leads";
+  //   var response = await Dio().post(url, data: formData);
+  //   var jsonData = response.data;
+  //   print(jsonData);
 
-    if (response.statusCode == 200) {
-      // if(jsonData['today_count'] != '0'){
-      //   todayscount = jsonData['today_count'];
-      //   follow_up_count = jsonData['follow_count'];
-      // }
-      print("done lead list");
-      print(loginenc_id.toString());
+  //   if (response.statusCode == 200) {
+  //     // if(jsonData['today_count'] != '0'){
+  //     //   todayscount = jsonData['today_count'];
+  //     //   follow_up_count = jsonData['follow_count'];
+  //     // }
+  //     print("done lead list");
+  //     print(loginenc_id.toString());
 
-      follow_count = jsonData['today_count'];
+  //     follow_count = jsonData['follow_count'];
 
-      return follow_count;
-    } else {
-      print("something went wrong");
-      return follow_count;
-    }
-  }
+  //     return follow_count;
+  //   } else {
+  //     print("something went wrong");
+  //     return follow_count;
+  //   }
+  // }
 
   Future<void> getmobilenumber() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -75,19 +76,25 @@ class _Follow_Up_PageState extends State<Follow_Up_Page> {
     print(loginenc_id.toString());
     FormData formData = FormData.fromMap({
       'enc_string': 'HSjLAS82146',
-      'enc_id': loginenc_id,
+      'enc_id': loginenc_id.toString(),
     });
 
     String url = "https://asm.sortbe.com/api/Follow-Leads";
     var response = await Dio().post(url, data: formData);
     var jsonData = response.data;
     print(jsonData);
-    follow_count = await getfollowcount();
+    // follow_count = await getfollowcount();
+    // follow_count = await jsonData['follow_count'];
+    // print(follow_count);
 
+    // _todaysleadlist.clear();
     if (response.statusCode == 200) {
       print("done lead list");
       print(loginenc_id.toString());
-      _todaysleadlist.addAll(jsonData['follow_list']);
+      follow_count = jsonData['follow_count'].toString();
+      follow_count != '0'
+          ? _todaysleadlist.addAll(jsonData['follow_list'])
+          : null;
       print(_todaysleadlist);
       return _todaysleadlist;
     } else {
@@ -145,7 +152,8 @@ class _Follow_Up_PageState extends State<Follow_Up_Page> {
         child: FutureBuilder(
           future: getleadlist(),
           builder: (context, snapshot) {
-            if (follow_count.toString() != '0' && !snapshot.hasData) {
+            if (follow_count.toString() != '0' &&
+                snapshot.connectionState == ConnectionState.waiting) {
               return Center(
                 child: CircularProgressIndicator(),
               );
@@ -544,6 +552,66 @@ class _Follow_Up_PageState extends State<Follow_Up_Page> {
                                                                     ],
                                                                   ),
                                                                 )),
+                                                            SizedBox(
+                                                              height: 10,
+                                                            ),
+                                                            Container(
+                                                                width: double
+                                                                    .infinity,
+                                                                // height: 50,
+                                                                decoration: BoxDecoration(
+                                                                    color: Color
+                                                                        .fromARGB(
+                                                                            255,
+                                                                            255,
+                                                                            255,
+                                                                            255),
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            10),
+                                                                    border: Border.all(
+                                                                        width:
+                                                                            1)),
+                                                                child: Padding(
+                                                                  padding: const EdgeInsets
+                                                                          .symmetric(
+                                                                      vertical:
+                                                                          14.0,
+                                                                      horizontal:
+                                                                          8.0),
+                                                                  child: Row(
+                                                                    mainAxisAlignment:
+                                                                        MainAxisAlignment
+                                                                            .spaceBetween,
+                                                                    children: [
+                                                                      // SizedBox(width: 1),
+                                                                      Text(
+                                                                        "Reason",
+                                                                        style: TextStyle(
+                                                                            fontWeight:
+                                                                                FontWeight.bold),
+                                                                      ),
+                                                                      // SizedBox(width: 9),
+                                                                      Container(
+                                                                        width: MediaQuery.of(context).size.width *
+                                                                            0.5,
+                                                                        child:
+                                                                            Text(
+                                                                          // snapshot.data![index]
+                                                                          //     [
+                                                                          //     'reason'],
+                                                                          "I am postponing this because i have to go somewhere and will not be able to do.",
+                                                                          textAlign:
+                                                                              TextAlign.end,
+                                                                        ),
+                                                                      ),
+                                                                      // SizedBox(width: 1),
+                                                                    ],
+                                                                  ),
+                                                                )),
+                                                            SizedBox(
+                                                              height: 10,
+                                                            )
                                                           ],
                                                         ),
                                                       ),
@@ -619,7 +687,18 @@ class _Follow_Up_PageState extends State<Follow_Up_Page> {
                                                                   .data![index]
                                                               ['lead_id'])))
                                           .then((value) {
-                                        setState(() {});
+                                        print(value);
+                                        setState(() {
+                                          _todaysleadlist.clear();
+                                        });
+
+                                        //   Navigator.pushReplacement(
+                                        //       context,
+                                        //       MaterialPageRoute(
+                                        //           builder: (context) =>
+                                        //               Nav_Screen(
+                                        //                 initialIndex: 2,
+                                        //               )));
                                       });
                                     },
                                     child: Container(
@@ -657,7 +736,7 @@ class _Follow_Up_PageState extends State<Follow_Up_Page> {
                                       await getmobilenumber();
                                       final Uri url = Uri(
                                         scheme: 'tel',
-                                        path: phone_number,
+                                        path: snapshot.data![index]['mobile'],
                                       );
                                       if (await canLaunchUrl(url)) {
                                         await launchUrl(url);

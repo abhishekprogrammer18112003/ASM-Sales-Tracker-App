@@ -90,7 +90,7 @@ class _Home_PageState extends State<Home_Page> {
         body: FutureBuilder(
           future: getleadlist(),
           builder: (context, snapshot) {
-            if (!snapshot.hasData) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
               return Center(
                 child: CircularProgressIndicator(),
               );
@@ -107,9 +107,8 @@ class _Home_PageState extends State<Home_Page> {
                         context,
                         MaterialPageRoute(
                             builder: (context) => Todays_Lead())).then((value) {
-                      setState(() {
-                        // Call setState to refresh the page.
-                      });
+                      setState(() {});
+                      // });
                     });
                   },
                   child: Padding(
@@ -150,7 +149,7 @@ class _Home_PageState extends State<Home_Page> {
                                 Text(
                                   todayscount.toString(),
                                   style: TextStyle(
-                                      fontSize: 35.0,
+                                      fontSize: 30.0,
                                       fontWeight: FontWeight.w700,
                                       color: Colors.grey),
                                 ),

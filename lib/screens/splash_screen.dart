@@ -2,8 +2,11 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:asm_sales_tracker/screens/login_screen.dart';
 import 'package:asm_sales_tracker/screens/nav_screen.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
+import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Splash_Screen extends StatefulWidget {
@@ -14,6 +17,7 @@ class Splash_Screen extends StatefulWidget {
 class _Splash_ScreenState extends State<Splash_Screen> {
   bool? islogin;
   String? loginencid;
+
   Future<void> checklogin() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
@@ -111,6 +115,8 @@ class _Splash_ScreenState extends State<Splash_Screen> {
   void initState() {
     super.initState();
     login();
+    _getCurrentLocation();
+    give_permission();
     // Timer(Duration(seconds: 3), () {
     //   islogin
     //       ? Navigator.pushReplacement(
@@ -120,6 +126,110 @@ class _Splash_ScreenState extends State<Splash_Screen> {
     //       : Navigator.pushReplacement(
     //           context, MaterialPageRoute(builder: (context) => Login_Screen()));
     // });
+  }
+
+  String? latitude;
+  String? longitude;
+  Future<void> _getCurrentLocation() async {
+    final position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+
+    setState(() {
+      latitude = position.latitude as String?;
+      longitude = position.longitude as String?;
+
+      // "Latitude: ${position.latitude}, Longitude: ${position.longitude}";
+    });
+  }
+
+  Future<double> getlatitude() async {
+    final position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+
+    return position.latitude;
+  }
+
+  Future<double> getlongitude() async {
+    final position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+
+    return position.longitude;
+  }
+
+  Future<String> getdetails() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    loginencid = prefs.getString("login_enc_id");
+    return loginencid!;
+  }
+
+  Future<void> send_location() async {
+    print('****************************');
+
+    loginencid = await getdetails() as String?;
+
+    latitude = (await getlatitude()).toString();
+    longitude = (await getlongitude()).toString();
+    print("${latitude.toString()}     ${longitude.toString()}");
+    print(loginencid.toString());
+    FormData formData = FormData.fromMap({
+      'enc_string': 'HSjLAS82146',
+      'enc_id': loginencid.toString(),
+      'lat': latitude.toString(),
+      'long': longitude.toString(),
+    });
+
+    String url = "https://asm.sortbe.com/api/User-Tracker";
+    var response = await Dio().post(url, data: formData);
+    var jsonData = response.data;
+    print(jsonData);
+    print(latitude);
+    print(longitude);
+    // follow_count = await getfollowcount();
+    // follow_count = await jsonData['follow_count'];
+    // print(follow_count);
+
+    // _todaysleadlist.clear();
+    if (response.statusCode == 200) {
+      print("done location post list");
+      print(loginencid.toString());
+      print("******done location*********");
+    } else {
+      print("something went wrong");
+    }
+  }
+
+  Future<void> give_permission() async {
+    var permissionStatus = await Permission.location.request();
+    print("Permission given");
+    location_permission(permissionStatus);
+  }
+
+  Future<void> location_permission(var permissionStatus) async {
+    if (permissionStatus == PermissionStatus.granted) {
+      print("Location access given successfully");
+      if (loginencid != Null) {
+        print("sending location");
+        await send_location();
+        // give_permission();
+      }
+    } else {
+      print("give permission");
+      give_permission();
+    }
+    Timer.periodic(Duration(minutes: 2), (Timer t) async {
+      if (permissionStatus == PermissionStatus.granted) {
+        print("Location access given successfully");
+        if (loginencid != Null) {
+          print("sending location");
+          await send_location();
+          // give_permission();
+        }
+      } else {
+        print("give permission");
+        give_permission();
+      }
+    });
   }
 
   @override

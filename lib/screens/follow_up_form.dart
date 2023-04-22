@@ -97,6 +97,43 @@ class _Follow_Up_FormState extends State<Follow_Up_Form> {
     }
   }
 
+  void show() {
+    // setState(() {
+    //   showtextbusinesstype == true;
+    // });
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        duration: Duration(milliseconds: 700),
+        content: Container(
+          margin: EdgeInsets.symmetric(horizontal: 25),
+          // padding: EdgeInsets.all(16),
+          height: 40,
+          decoration: BoxDecoration(
+              color: Color.fromARGB(192, 252, 48, 48),
+              borderRadius: BorderRadius.all(Radius.circular(10))),
+          child: Center(
+              child: Text(
+            "Enter all required fields",
+            style: TextStyle(fontWeight: FontWeight.bold),
+          )),
+        )));
+    // throw 'Please Enter all required fields';
+    // ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+    //     behavior: SnackBarBehavior.floating,
+    //     backgroundColor: Colors.transparent,
+    //     elevation: 0,
+    // content: Container(
+    //   padding: EdgeInsets.all(16),
+    //   height: 50,
+    //   decoration: BoxDecoration(
+    //       color: Color.fromARGB(255, 255, 0, 0),
+    //       borderRadius: BorderRadius.all(Radius.circular(20))),
+    //   child: Center(child: Text("Something Went Wrong")),
+    // )));
+  }
+
   final _formKey = GlobalKey<FormState>();
 
   final _reason = TextEditingController();
@@ -187,12 +224,12 @@ class _Follow_Up_FormState extends State<Follow_Up_Form> {
                           border: OutlineInputBorder(),
                           suffixIcon: Icon(Icons.arrow_drop_down_outlined),
                         ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please Select the Follow Status';
-                          }
-                          return null;
-                        },
+                        // validator: (value) {
+                        //   if (value == null || value.isEmpty) {
+                        //     return 'Please Select the Follow Status';
+                        //   }
+                        //   return null;
+                        // },
                         readOnly: true,
                         controller:
                             TextEditingController(text: selectfollowstatus),
@@ -273,7 +310,7 @@ class _Follow_Up_FormState extends State<Follow_Up_Form> {
                         GestureDetector(
                           onTap: () {
                             if (_formKey.currentState!.validate()) {
-                              _submit();
+                              selectfollowstatus == null ? show() : _submit();
                             }
                           },
                           child: Container(
@@ -284,10 +321,14 @@ class _Follow_Up_FormState extends State<Follow_Up_Form> {
                             height: 46,
                             width: 80,
                             child: _isloading
-                                ? const Center(
-                                    child: CircularProgressIndicator(
-                                      backgroundColor: Colors.white,
-                                      strokeWidth: 2.5,
+                                ? Center(
+                                    child: Container(
+                                      height: 22,
+                                      width: 22,
+                                      child: CircularProgressIndicator(
+                                        backgroundColor: Colors.white,
+                                        strokeWidth: 3,
+                                      ),
                                     ),
                                   )
                                 : const Center(

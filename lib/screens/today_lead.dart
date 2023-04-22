@@ -1,6 +1,7 @@
 import 'dart:convert';
 // import 'dart:ffi';
 import 'package:asm_sales_tracker/screens/follow_up_update.dart';
+import 'package:asm_sales_tracker/screens/home_page.dart';
 import 'package:asm_sales_tracker/screens/nav_screen.dart';
 import 'package:dio/dio.dart';
 
@@ -130,18 +131,20 @@ class _Todays_LeadState extends State<Todays_Lead> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: false,
-        leading: GestureDetector(
-          onTap: () {
-            Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => Nav_Screen(
-                          initialIndex: 0,
-                        )));
-          },
-          child: Icon(Icons.arrow_back),
-        ),
+        automaticallyImplyLeading: true,
+        // leading: GestureDetector(
+        //   onTap: () {
+        //     Navigator.pushReplacement(
+        //         context,
+        //         MaterialPageRoute(
+        //             builder: (context) => Nav_Screen(
+        //                   initialIndex: 0,
+        //                 ))).then((value) {
+        //       setState(() {});
+        //     });
+        // },
+        // child: Icon(Icons.arrow_back),
+        // ),
         flexibleSpace: Container(
           decoration: const BoxDecoration(
               gradient: LinearGradient(colors: [
@@ -158,7 +161,8 @@ class _Todays_LeadState extends State<Todays_Lead> {
         child: FutureBuilder(
           future: getleadlist(),
           builder: (context, snapshot) {
-            if (follow_count.toString() != '0' && !snapshot.hasData) {
+            if (follow_count.toString() != '0' &&
+                snapshot.connectionState == ConnectionState.waiting) {
               return Center(
                 child: CircularProgressIndicator(),
               );
@@ -632,8 +636,26 @@ class _Todays_LeadState extends State<Todays_Lead> {
                                                                   .data![index]
                                                               ['lead_id'])))
                                           .then((value) {
-                                        setState(() {});
+                                        setState(() {
+                                          _todaysleadlist.clear();
+                                          // snapshot.data!.clear();
+                                        });
                                       });
+                                      //     .then((value) {
+                                      //   setState(() {});
+                                      //   // Navigator.pushReplacement(
+                                      //   //         context,
+                                      //   //         MaterialPageRoute(
+                                      //   //             builder: (context) =>
+                                      //   //                 Todays_Lead()))
+                                      //   //     .then((value) {
+                                      //   // Navigator.popUntil(
+                                      //   //     context,
+                                      //   //     ModalRoute.withName(
+                                      //   //         Navigator.defaultRouteName));
+                                      //   // Navigator.pop(context);
+                                      //   // });
+                                      // });
                                     },
                                     child: Container(
                                         width:
@@ -670,7 +692,7 @@ class _Todays_LeadState extends State<Todays_Lead> {
                                       await getmobilenumber();
                                       final Uri url = Uri(
                                         scheme: 'tel',
-                                        path: phone_number,
+                                        path: snapshot.data![index]['mobile'],
                                       );
                                       if (await canLaunchUrl(url)) {
                                         await launchUrl(url);

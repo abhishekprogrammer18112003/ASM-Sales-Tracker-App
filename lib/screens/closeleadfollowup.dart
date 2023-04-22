@@ -76,12 +76,7 @@ class _closeleadfollowupState extends State<closeleadfollowup> {
         setState(() {
           _isloading1 = false;
         });
-        Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-                builder: (context) => Nav_Screen(
-                      initialIndex: 2,
-                    )));
+        Navigator.pop(context);
         // Navigator.push(
         //   context,
         //   MaterialPageRoute(builder: (context) => Follow_Up_Page()),
@@ -192,10 +187,14 @@ class _closeleadfollowupState extends State<closeleadfollowup> {
                             height: 46,
                             width: 85,
                             child: _isloading1
-                                ? const Center(
-                                    child: CircularProgressIndicator(
-                                      backgroundColor: Colors.white,
-                                      strokeWidth: 2.5,
+                                ? Center(
+                                    child: Container(
+                                      height: 25,
+                                      width: 25,
+                                      child: CircularProgressIndicator(
+                                        backgroundColor: Colors.white,
+                                        strokeWidth: 3,
+                                      ),
                                     ),
                                   )
                                 : const Center(

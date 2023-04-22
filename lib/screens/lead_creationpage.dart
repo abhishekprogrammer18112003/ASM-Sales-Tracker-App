@@ -36,6 +36,7 @@ class _Lead_Creation_pageState extends State<Lead_Creation_page> {
   final _address = TextEditingController();
   final _gst = TextEditingController();
   String? _selecttype;
+  bool showtextbusinesstype = true;
 
   final List<String> _typeoptions = [
     'Builder',
@@ -73,8 +74,10 @@ class _Lead_Creation_pageState extends State<Lead_Creation_page> {
   }
 
   String? _selectcement;
+  String? _selectprevcement;
   List<dynamic> _cementoptions = [];
   String? cementindex;
+  String? cementprevindex;
 
   Future<List?> getcementdate() async {
     print('****************************');
@@ -95,7 +98,9 @@ class _Lead_Creation_pageState extends State<Lead_Creation_page> {
 
   @override
   String? _selectsteel;
+  String? _selectprevsteel;
   String? steelindex;
+  String? steelprevindex;
   List<dynamic> _steeloptions = [];
   Future<List?> getsteeldate() async {
     print('****************************');
@@ -117,7 +122,8 @@ class _Lead_Creation_pageState extends State<Lead_Creation_page> {
   //seller details
   final _sellername = TextEditingController();
   final _brand = TextEditingController();
-  final _pricing = TextEditingController();
+  final cement_pricing = TextEditingController();
+  final steel_pricing = TextEditingController();
   final _selleraddress = TextEditingController();
   final _sellermobile = TextEditingController();
 
@@ -198,7 +204,53 @@ class _Lead_Creation_pageState extends State<Lead_Creation_page> {
   //   return res.reasonPhrase;
   // }
 
-  Future<void> _submit(String cement_id, String steel_id) async {
+  void next() {
+    _currentPageIndex++;
+    _pageController.nextPage(
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
+  }
+
+  void show() {
+    // setState(() {
+    //   showtextbusinesstype == true;
+    // });
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        duration: Duration(milliseconds: 700),
+        content: Container(
+          margin: EdgeInsets.symmetric(horizontal: 25),
+          // padding: EdgeInsets.all(16),
+          height: 40,
+          decoration: BoxDecoration(
+              color: Color.fromARGB(192, 252, 48, 48),
+              borderRadius: BorderRadius.all(Radius.circular(10))),
+          child: Center(
+              child: Text(
+            "Enter all required fields",
+            style: TextStyle(fontWeight: FontWeight.bold),
+          )),
+        )));
+    // throw 'Please Enter all required fields';
+    // ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+    //     behavior: SnackBarBehavior.floating,
+    //     backgroundColor: Colors.transparent,
+    //     elevation: 0,
+    // content: Container(
+    //   padding: EdgeInsets.all(16),
+    //   height: 50,
+    //   decoration: BoxDecoration(
+    //       color: Color.fromARGB(255, 255, 0, 0),
+    //       borderRadius: BorderRadius.all(Radius.circular(20))),
+    //   child: Center(child: Text("Something Went Wrong")),
+    // )));
+  }
+
+  Future<void> _submit(String cement_id, String steel_id, String prev_cement_id,
+      String prev_steel_id) async {
     print("**********************");
     setState(() {
       _isloading = true;
@@ -250,8 +302,14 @@ class _Lead_Creation_pageState extends State<Lead_Creation_page> {
       'sand': _sand.text.toString(),
       'other_items': _otheritems.text.toString(),
       'prev_seller_name': _sellername.text.toString(),
-      'brand': _brand.text.toString(),
-      'pricing': _pricing.text.toString(),
+      // 'brand': _brand.text.toString(),
+      // 'pricing': _pricing.text.toString(),
+      'cement_id': prev_cement_id,
+      'cement_price': cement_pricing.toString(),
+      'steel_id': prev_steel_id,
+
+      'steel_price': steel_pricing.toString(),
+
       'prev_seller_address': _selleraddress.text.toString(),
       'prev_seller_contact_no': _sellermobile.text.toString(),
       'project_img_flag': imageflag.toString(),
@@ -265,7 +323,7 @@ class _Lead_Creation_pageState extends State<Lead_Creation_page> {
     });
     print(_sellername.text.toString());
     print(_brand.text.toString());
-    print(_pricing.text.toString());
+    // print(_pricing.text.toString());
     print(_selleraddress.text.toString());
     print(_sellermobile.text.toString());
 
@@ -477,65 +535,77 @@ class _Lead_Creation_pageState extends State<Lead_Creation_page> {
                   //   },
                   // ),
                   TextFormField(
-                      controller: TextEditingController(text: _selecttype),
+                    controller: TextEditingController(text: _selecttype),
 
-                      // textInputAction: TextInputAction.,
+                    // textInputAction: TextInputAction.,
 
-                      decoration: const InputDecoration(
-                        // filled: true,
-                        // labelText: 'Option',
-                        hintText: 'Business Type',
-                        border: OutlineInputBorder(),
-                        suffixIcon: Icon(Icons.arrow_drop_down_outlined),
-                      ),
-                      validator: (value) {
-                        if (value!.isEmpty) {
-                          return 'Please Select the Business Type';
-                        }
-                        return null;
-                      },
-                      readOnly: true,
-                      onTap: () {
-                        showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return AlertDialog(
-                                title: Text(
-                                  'Business Type',
-                                  style: TextStyle(fontWeight: FontWeight.w700),
-                                ),
-                                content: Container(
-                                  width: double.maxFinite,
-                                  child: ListView.builder(
-                                    shrinkWrap: true,
-                                    itemCount: _typeoptions.length,
-                                    itemBuilder:
-                                        (BuildContext context, int index) {
-                                      return GestureDetector(
-                                        onTap: () {
-                                          setState(() {
-                                            _selecttype = _typeoptions[index];
-                                          });
-                                          Navigator.pop(context);
-                                        },
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(4.0),
-                                          child: Container(
-                                            padding: EdgeInsets.symmetric(
-                                                vertical: 10),
-                                            child: Text(_typeoptions[index],
-                                                style: TextStyle(
-                                                  fontSize: 16,
-                                                )),
-                                          ),
+                    // autovalidateMode: AutovalidateMode.disabled,
+                    decoration: const InputDecoration(
+                      // filled: true,
+                      // labelText: 'Option',
+                      hintText: 'Business Type',
+                      border: OutlineInputBorder(),
+
+                      suffixIcon: Icon(Icons.arrow_drop_down_outlined),
+                    ),
+
+                    readOnly: true,
+                    onTap: () {
+                      showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Text(
+                                'Business Type',
+                                style: TextStyle(fontWeight: FontWeight.w700),
+                              ),
+                              content: Container(
+                                width: double.maxFinite,
+                                child: ListView.builder(
+                                  shrinkWrap: true,
+                                  itemCount: _typeoptions.length,
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    return GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          _selecttype = _typeoptions[index];
+                                          // showtextbusinesstype = false;
+                                        });
+                                        Navigator.pop(context);
+                                      },
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(4.0),
+                                        child: Container(
+                                          padding: EdgeInsets.symmetric(
+                                              vertical: 10),
+                                          child: Text(_typeoptions[index],
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                              )),
                                         ),
-                                      );
-                                    },
-                                  ),
+                                      ),
+                                    );
+                                  },
                                 ),
-                              );
-                            });
-                      }),
+                              ),
+                            );
+                          });
+                    },
+                    // autovalidateMode: AutovalidateMode.values[1],
+                    // validator: (value) {
+                    //   if (value!.isEmpty) {
+                    //     return 'Please Select the Business Type';
+                    //   }
+                    //   return null;
+                    // },
+                  ),
+                  // showtextbusinesstype
+                  //     ? Text(
+                  //         "Select the Business type",
+                  //         style: TextStyle(color: Colors.red),
+                  //       )
+                  //     : Text(""),
                   const SizedBox(height: 40.0),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
@@ -555,11 +625,8 @@ class _Lead_Creation_pageState extends State<Lead_Creation_page> {
                             )),
                         onTap: () {
                           if (_formKey1.currentState!.validate()) {
-                            _currentPageIndex++;
-                            _pageController.nextPage(
-                              duration: const Duration(milliseconds: 300),
-                              curve: Curves.easeInOut,
-                            );
+                            print(_selecttype);
+                            _selecttype == null ? show() : next();
                           }
                         },
                       ),
@@ -698,12 +765,12 @@ class _Lead_Creation_pageState extends State<Lead_Creation_page> {
                         hintText: 'Select the Cement',
                         border: OutlineInputBorder(),
                         suffixIcon: Icon(Icons.arrow_drop_down_outlined)),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please Select the Cement';
-                      }
-                      return null;
-                    },
+                    // validator: (value) {
+                    //   if (value == null || value.isEmpty) {
+                    //     return 'Please Select the Cement';
+                    //   }
+                    //   return null;
+                    // },
                     readOnly: true,
                     controller: TextEditingController(text: _selectcement),
                     onTap: () {
@@ -787,12 +854,12 @@ class _Lead_Creation_pageState extends State<Lead_Creation_page> {
                       border: OutlineInputBorder(),
                       suffixIcon: Icon(Icons.arrow_drop_down_outlined),
                     ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please Select the Steel';
-                      }
-                      return null;
-                    },
+                    // validator: (value) {
+                    //   if (value == null || value.isEmpty) {
+                    //     return 'Please Select the Steel';
+                    //   }
+                    //   return null;
+                    // },
                     readOnly: true,
                     controller: TextEditingController(text: _selectsteel),
                     onTap: () {
@@ -922,11 +989,14 @@ class _Lead_Creation_pageState extends State<Lead_Creation_page> {
                           )),
                       onTap: () {
                         if (_formKey2.currentState!.validate()) {
-                          _currentPageIndex++;
-                          _pageController.nextPage(
-                            duration: const Duration(milliseconds: 300),
-                            curve: Curves.easeInOut,
-                          );
+                          // _currentPageIndex++;
+                          // _pageController.nextPage(
+                          //   duration: const Duration(milliseconds: 300),
+                          //   curve: Curves.easeInOut,
+                          // );
+                          _selectcement == null || _selectsteel == null
+                              ? show()
+                              : next();
                         }
                       },
                     ),
@@ -1108,25 +1178,153 @@ class _Lead_Creation_pageState extends State<Lead_Creation_page> {
                   height: 10,
                 ),
                 //brand
-                TextFormField(
-                  controller: _brand,
-                  // obscureText: true,
-                  decoration: const InputDecoration(
-                    labelText: 'Brand (optional)',
-                    border: OutlineInputBorder(),
-                  ),
+                // TextFormField(
+                //   controller: _brand,
+                //   // obscureText: true,
+                //   decoration: const InputDecoration(
+                //     labelText: 'Brand (optional)',
+                //     border: OutlineInputBorder(),
+                //   ),
 
-                  keyboardType: TextInputType.text,
-                ),
+                //   keyboardType: TextInputType.text,
+                // ),
+                TextFormField(
+                    textInputAction: TextInputAction.next,
+                    // autovalidateMode: AutovalidateMode.onUserInteraction,
+                    decoration: const InputDecoration(
+                      // filled: true,
+                      // labelText: 'Option',
+                      hintText: 'Select the Cement (optional)',
+                      border: OutlineInputBorder(),
+                      suffixIcon: Icon(Icons.arrow_drop_down_outlined),
+                    ),
+                    // validator: (value) {
+                    //   if (value == null || value.isEmpty) {
+                    //     return 'Please Select the Steel';
+                    //   }
+                    //   return null;
+                    // },
+                    readOnly: true,
+                    controller: TextEditingController(text: _selectprevcement),
+                    onTap: () {
+                      showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Text('Select the Cement',
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.w700)),
+                              content: Container(
+                                width: double.maxFinite,
+                                child: ListView.builder(
+                                  shrinkWrap: true,
+                                  itemCount: _cementoptions.length,
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    return GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          _selectprevcement =
+                                              _cementoptions[index]['name'];
+                                          cementprevindex =
+                                              _cementoptions[index]['id'];
+                                        });
+                                        Navigator.pop(context);
+                                      },
+                                      child: Container(
+                                        padding:
+                                            EdgeInsets.symmetric(vertical: 10),
+                                        child:
+                                            Text(_cementoptions[index]['name']),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            );
+                          });
+                    }),
                 const SizedBox(
                   height: 10,
                 ),
                 //pricing
                 TextFormField(
-                  controller: _pricing,
+                  controller: cement_pricing,
                   // obscureText: true,
                   decoration: const InputDecoration(
-                    labelText: 'Pricing (optional)',
+                    labelText: 'Cement Price (optional)',
+                    border: OutlineInputBorder(),
+                  ),
+
+                  keyboardType: TextInputType.phone,
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                TextFormField(
+                    textInputAction: TextInputAction.next,
+                    // autovalidateMode: AutovalidateMode.onUserInteraction,
+                    decoration: const InputDecoration(
+                      // filled: true,
+                      // labelText: 'Option',
+                      hintText: 'Select the Steel (optional)',
+                      border: OutlineInputBorder(),
+                      suffixIcon: Icon(Icons.arrow_drop_down_outlined),
+                    ),
+                    // validator: (value) {
+                    //   if (value == null || value.isEmpty) {
+                    //     return 'Please Select the Steel';
+                    //   }
+                    //   return null;
+                    // },
+                    readOnly: true,
+                    controller: TextEditingController(text: _selectprevsteel),
+                    onTap: () {
+                      showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Text('Select the Steel',
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.w700)),
+                              content: Container(
+                                width: double.maxFinite,
+                                child: ListView.builder(
+                                  shrinkWrap: true,
+                                  itemCount: _steeloptions.length,
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    return GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          _selectprevsteel =
+                                              _steeloptions[index]['name'];
+                                          steelprevindex =
+                                              _steeloptions[index]['id'];
+                                        });
+                                        Navigator.pop(context);
+                                      },
+                                      child: Container(
+                                        padding:
+                                            EdgeInsets.symmetric(vertical: 10),
+                                        child:
+                                            Text(_steeloptions[index]['name']),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            );
+                          });
+                    }),
+                const SizedBox(
+                  height: 10,
+                ),
+                TextFormField(
+                  controller: steel_pricing,
+                  // obscureText: true,
+                  decoration: const InputDecoration(
+                    labelText: 'Steel Price (optional)',
                     border: OutlineInputBorder(),
                   ),
 
@@ -1188,7 +1386,11 @@ class _Lead_Creation_pageState extends State<Lead_Creation_page> {
                     ),
                     GestureDetector(
                       onTap: () {
-                        _submit(cementindex.toString(), steelindex.toString());
+                        _submit(
+                            cementindex.toString(),
+                            steelindex.toString(),
+                            cementprevindex.toString(),
+                            steelprevindex.toString());
                       },
                       child: Container(
                         decoration: BoxDecoration(
@@ -1198,10 +1400,14 @@ class _Lead_Creation_pageState extends State<Lead_Creation_page> {
                         height: 46,
                         width: 80,
                         child: _isloading
-                            ? const Center(
-                                child: CircularProgressIndicator(
-                                  backgroundColor: Colors.white,
-                                  strokeWidth: 2.5,
+                            ? Center(
+                                child: Container(
+                                  height: 22,
+                                  width: 22,
+                                  child: CircularProgressIndicator(
+                                    backgroundColor: Colors.white,
+                                    strokeWidth: 3,
+                                  ),
                                 ),
                               )
                             : const Center(
