@@ -1,10 +1,9 @@
 import 'dart:convert';
 
+import 'package:asm_sales_tracker/constant.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
-
-import 'nav_screen.dart';
 
 class closeleadfollowup extends StatefulWidget {
   // const closeleadfollowup({super.key});
@@ -32,14 +31,6 @@ class _closeleadfollowupState extends State<closeleadfollowup> {
     return loginenc_id;
   }
 
-  @override
-  // void initState() {
-  //   dateinput.text = ""; //set the initial value of text field
-  //   super.initState();
-  //   // getencid();
-  //   getfollowstatus();
-  // }
-
   Future<void> _closelead() async {
     print("********************close lead *******************");
     setState(() {
@@ -51,8 +42,7 @@ class _closeleadfollowupState extends State<closeleadfollowup> {
     print(loginenc_id);
     print(client_id);
 
-    final response = await http
-        .post(Uri.parse('https://asm.sortbe.com/api/Close-Lead'), body: {
+    final response = await http.post(Uri.parse(apiurl + 'Close-Lead'), body: {
       'enc_string': 'HSjLAS82146',
       'enc_id': loginenc_id.toString(),
       'client_id': client_id.toString(),

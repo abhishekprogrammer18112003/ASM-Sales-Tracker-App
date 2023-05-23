@@ -1,14 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 
-import 'package:asm_sales_tracker/screens/follow_up_page.dart';
 import 'package:asm_sales_tracker/screens/nav_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart' as intl;
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../constant.dart';
 
 class Follow_Up_Form extends StatefulWidget {
   const Follow_Up_Form({super.key});
@@ -43,8 +42,8 @@ class _Follow_Up_FormState extends State<Follow_Up_Form> {
       _isloading = true;
     });
     print(dateinput.text.toString());
-    final response = await http
-        .post(Uri.parse('https://asm.sortbe.com/api/Follow-Update'), body: {
+    final response =
+        await http.post(Uri.parse(apiurl + 'Follow-Update'), body: {
       'enc_string': 'HSjLAS82146',
       'enc_id': loginenc_id.toString(),
       'client_id': client_id.toString(),
@@ -82,8 +81,8 @@ class _Follow_Up_FormState extends State<Follow_Up_Form> {
 
   Future<List?> getfollowstatus() async {
     print('****************************');
-    final response = await http
-        .post(Uri.parse("https://asm.sortbe.com/api/Follow-Status"), body: {
+    final response =
+        await http.post(Uri.parse(apiurl + "Follow-Status"), body: {
       'enc_string': 'HSjLAS82146',
     });
 
@@ -119,19 +118,6 @@ class _Follow_Up_FormState extends State<Follow_Up_Form> {
             style: TextStyle(fontWeight: FontWeight.bold),
           )),
         )));
-    // throw 'Please Enter all required fields';
-    // ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-    //     behavior: SnackBarBehavior.floating,
-    //     backgroundColor: Colors.transparent,
-    //     elevation: 0,
-    // content: Container(
-    //   padding: EdgeInsets.all(16),
-    //   height: 50,
-    //   decoration: BoxDecoration(
-    //       color: Color.fromARGB(255, 255, 0, 0),
-    //       borderRadius: BorderRadius.all(Radius.circular(20))),
-    //   child: Center(child: Text("Something Went Wrong")),
-    // )));
   }
 
   final _formKey = GlobalKey<FormState>();

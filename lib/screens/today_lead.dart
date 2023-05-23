@@ -1,11 +1,5 @@
-import 'dart:convert';
-// import 'dart:ffi';
-import 'package:asm_sales_tracker/screens/follow_up_update.dart';
-import 'package:asm_sales_tracker/screens/home_page.dart';
-import 'package:asm_sales_tracker/screens/nav_screen.dart';
+import 'package:asm_sales_tracker/constant.dart';
 import 'package:dio/dio.dart';
-
-import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -52,7 +46,7 @@ class _Todays_LeadState extends State<Todays_Lead> {
       'enc_id': loginenc_id,
     });
 
-    String url = "https://asm.sortbe.com/api/Dashboard-Data";
+    String url = apiurl + "Dashboard-Data";
     var response = await Dio().post(url, data: formData);
     var jsonData = response.data;
     print(jsonData);
@@ -85,7 +79,7 @@ class _Todays_LeadState extends State<Todays_Lead> {
       'enc_id': loginenc_id,
     });
 
-    String url = "https://asm.sortbe.com/api/Today-Leads";
+    String url = apiurl + "Today-Leads";
     var response = await Dio().post(url, data: formData);
     var jsonData = response.data;
     print(jsonData);
@@ -132,19 +126,6 @@ class _Todays_LeadState extends State<Todays_Lead> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: true,
-        // leading: GestureDetector(
-        //   onTap: () {
-        //     Navigator.pushReplacement(
-        //         context,
-        //         MaterialPageRoute(
-        //             builder: (context) => Nav_Screen(
-        //                   initialIndex: 0,
-        //                 ))).then((value) {
-        //       setState(() {});
-        //     });
-        // },
-        // child: Icon(Icons.arrow_back),
-        // ),
         flexibleSpace: Container(
           decoration: const BoxDecoration(
               gradient: LinearGradient(colors: [

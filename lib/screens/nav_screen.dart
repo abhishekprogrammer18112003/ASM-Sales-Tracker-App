@@ -1,4 +1,3 @@
-import 'package:asm_sales_tracker/screens/follow_up_form.dart';
 import 'package:asm_sales_tracker/screens/follow_up_page.dart';
 import 'package:asm_sales_tracker/screens/home_page.dart';
 import 'package:asm_sales_tracker/screens/lead_creationpage.dart';
@@ -43,32 +42,38 @@ class _Nav_ScreenState extends State<Nav_Screen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: PageView(
-        controller: _pageController,
-        children: _screens,
-        onPageChanged: _onPageChanged,
-        physics: const NeverScrollableScrollPhysics(),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        // fixedColor: Colors.amber,
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus();
+        WidgetsBinding.instance.focusManager.primaryFocus?.unfocus();
+      },
+      child: Scaffold(
+        body: PageView(
+          controller: _pageController,
+          children: _screens,
+          onPageChanged: _onPageChanged,
+          physics: const NeverScrollableScrollPhysics(),
+        ),
+        bottomNavigationBar: BottomNavigationBar(
+          // fixedColor: Colors.amber,
 
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Dashboard',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.add),
-            label: 'Create Leads',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.follow_the_signs),
-            label: 'Follow-Up',
-          ),
-        ],
+          currentIndex: _selectedIndex,
+          onTap: _onItemTapped,
+          items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home),
+              label: 'Dashboard',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.add),
+              label: 'Create Leads',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.follow_the_signs),
+              label: 'Follow-Up',
+            ),
+          ],
+        ),
       ),
     );
   }

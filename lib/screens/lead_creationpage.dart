@@ -2,16 +2,20 @@
 
 import 'dart:convert';
 import 'dart:io';
+import 'package:asm_sales_tracker/constant.dart';
 import 'package:dio/dio.dart';
 
 import 'package:asm_sales_tracker/screens/follow_up_form.dart';
+// ignore: unused_import
 import 'package:asm_sales_tracker/screens/follow_up_page.dart';
+// ignore: unused_import
 import 'package:asm_sales_tracker/screens/nav_screen.dart';
 
-import 'package:flutter/services.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+// ignore: unused_import
 import 'package:mime_type/mime_type.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -50,16 +54,15 @@ class _Lead_Creation_pageState extends State<Lead_Creation_page> {
 
   //project details
   final _projname = TextEditingController();
-  final _location = TextEditingController();
   final _abuildingsqft = TextEditingController();
   final _typeofbuilding = TextEditingController();
   final _brick = TextEditingController();
   final _sand = TextEditingController();
   final _otheritems = TextEditingController();
-  late String loginenc_id;
-  void getencid() async {
+  String? loginenc_id;
+  Future<String> getencid() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    loginenc_id = prefs.getString("login_enc_id")!;
+    return prefs.getString("login_enc_id")!;
   }
 
   @override
@@ -69,6 +72,10 @@ class _Lead_Creation_pageState extends State<Lead_Creation_page> {
     getencid();
     getsteeldate();
     getcementdate();
+    getprevcementdate();
+    getprevsteeldate();
+    getlocation();
+    getsellersname();
     imageflag = '0';
     imageselected = false;
   }
@@ -76,13 +83,13 @@ class _Lead_Creation_pageState extends State<Lead_Creation_page> {
   String? _selectcement;
   String? _selectprevcement;
   List<dynamic> _cementoptions = [];
+  List<dynamic> _prevcementoptions = [];
   String? cementindex;
   String? cementprevindex;
 
   Future<List?> getcementdate() async {
     print('****************************');
-    final response = await http
-        .post(Uri.parse("https://asm.sortbe.com/api/Cement-List"), body: {
+    final response = await http.post(Uri.parse(apiurl + "Cement-List"), body: {
       'enc_string': 'HSjLAS82146',
     });
 
@@ -96,16 +103,33 @@ class _Lead_Creation_pageState extends State<Lead_Creation_page> {
     }
   }
 
+  Future<List?> getprevcementdate() async {
+    print('****************************');
+    final response = await http.post(Uri.parse(apiurl + "Cement-List"), body: {
+      'enc_string': 'HSjLAS82146',
+    });
+
+    if (response.statusCode == 200) {
+      print("done Cement");
+      final data = jsonDecode(response.body.toString());
+      _prevcementoptions.addAll(data['cement_name']);
+      return _prevcementoptions;
+    } else {
+      return null;
+    }
+  }
+
   @override
+  // ignore: override_on_non_overriding_member
   String? _selectsteel;
   String? _selectprevsteel;
   String? steelindex;
   String? steelprevindex;
   List<dynamic> _steeloptions = [];
+  List<dynamic> _prevsteeloptions = [];
   Future<List?> getsteeldate() async {
     print('****************************');
-    final response = await http
-        .post(Uri.parse("https://asm.sortbe.com/api/Steel-List"), body: {
+    final response = await http.post(Uri.parse(apiurl + "Steel-List"), body: {
       'enc_string': 'HSjLAS82146',
     });
 
@@ -119,18 +143,30 @@ class _Lead_Creation_pageState extends State<Lead_Creation_page> {
     }
   }
 
+  Future<List?> getprevsteeldate() async {
+    print('****************************');
+    final response = await http.post(Uri.parse(apiurl + "Steel-List"), body: {
+      'enc_string': 'HSjLAS82146',
+    });
+
+    if (response.statusCode == 200) {
+      print("done prev steel");
+      final data = jsonDecode(response.body.toString());
+      _prevsteeloptions.addAll(data['steel_name']);
+      return _prevsteeloptions;
+    } else {
+      return null;
+    }
+  }
+
   //seller details
-  final _sellername = TextEditingController();
-  final _brand = TextEditingController();
   final cement_pricing = TextEditingController();
   final steel_pricing = TextEditingController();
-  final _selleraddress = TextEditingController();
-  final _sellermobile = TextEditingController();
+  // final _selleraddress = TextEditingController();
+  // final _sellermobile = TextEditingController();
 
-  int _currentPageIndex = 0;
   final _pageController = PageController();
 
-  @override
   bool get wantKeepAlive => true;
   File? _image;
   String imageflag = '0';
@@ -177,35 +213,68 @@ class _Lead_Creation_pageState extends State<Lead_Creation_page> {
     prefs.setString("person_phone_number", _mobile.text.toString());
   }
 
-  // Future<Response?> multiPartUpload(File? image) async {
-  //   if (image == null || image.path == null) return null;
-  //   String? fileName = mime(image.path.split(Platform.pathSeparator).last);
-  //   String? mimeType = fileName;
-  //   String? mimee = mimeType?.split('/')[0];
-  //   String? type = mimeType?.split('/')[1];
+  Future<double> getlatitude() async {
+    final position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
 
-  //   Dio dio = new Dio();
-  //   dio.options.headers['Content-Type'] = "multipart/form-data";
-  //   FormData formData = FormData.fromMap({
-  //     'project_img': MultipartFile.fromFile(image.path,
-  //         filename: fileName, contentType: MediaType(mimee!, type!))
-  //   });
-  //   Response res = await dio.post('https://asm.sortbe.com/api/Create-Lead',
-  //       data: formData);
-  //   return res;
-  // }
-  // Future<String?> uploadImageHTTP(file, url) async {
-  //   print("upload image http");
-  //   var request = http.MultipartRequest('POST', Uri.parse(url));
-  //   request.files
-  //       .add(await http.MultipartFile.fromPath('project_img', file.path));
-  //   var res = await request.send();
-  //   print(res);
-  //   return res.reasonPhrase;
-  // }
+    return position.latitude;
+  }
+
+  Future<double> getlongitude() async {
+    final position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+
+    return position.longitude;
+  }
+
+  Future<String> getdetails() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    loginenc_id = prefs.getString("login_enc_id");
+    return loginenc_id!;
+  }
+
+  String? _selectlocation;
+  // String? steelindex;
+  String? locationindex;
+  List<dynamic> _locationoptions = [];
+  Future<List?> getlocation() async {
+    print('****************************');
+    loginenc_id = await getdetails() as String?;
+    final response = await http.post(Uri.parse(apiurl + "Location-List"),
+        body: {'enc_string': 'HSjLAS82146', 'enc_id': loginenc_id.toString()});
+
+    if (response.statusCode == 200) {
+      print("done location");
+      final data = jsonDecode(response.body.toString());
+      _locationoptions.addAll(data['status_name']);
+      return _locationoptions;
+    } else {
+      return null;
+    }
+  }
+
+  String? _selectsellersname;
+  // String? steelindex;
+  String? sellersindex;
+  List<dynamic> _sellersoptions = [];
+  Future<List?> getsellersname() async {
+    print('****************************');
+    loginenc_id = await getdetails() as String?;
+    final response = await http.post(Uri.parse(apiurl + "Seller-Info"),
+        body: {'enc_string': 'HSjLAS82146', 'enc_id': loginenc_id.toString()});
+
+    if (response.statusCode == 200) {
+      print("done sellersname");
+      final data = jsonDecode(response.body.toString());
+      _sellersoptions.addAll(data['status_name']);
+      return _sellersoptions;
+    } else {
+      return null;
+    }
+  }
 
   void next() {
-    _currentPageIndex++;
     _pageController.nextPage(
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
@@ -213,9 +282,6 @@ class _Lead_Creation_pageState extends State<Lead_Creation_page> {
   }
 
   void show() {
-    // setState(() {
-    //   showtextbusinesstype == true;
-    // });
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         behavior: SnackBarBehavior.floating,
         backgroundColor: Colors.transparent,
@@ -234,53 +300,21 @@ class _Lead_Creation_pageState extends State<Lead_Creation_page> {
             style: TextStyle(fontWeight: FontWeight.bold),
           )),
         )));
-    // throw 'Please Enter all required fields';
-    // ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-    //     behavior: SnackBarBehavior.floating,
-    //     backgroundColor: Colors.transparent,
-    //     elevation: 0,
-    // content: Container(
-    //   padding: EdgeInsets.all(16),
-    //   height: 50,
-    //   decoration: BoxDecoration(
-    //       color: Color.fromARGB(255, 255, 0, 0),
-    //       borderRadius: BorderRadius.all(Radius.circular(20))),
-    //   child: Center(child: Text("Something Went Wrong")),
-    // )));
   }
 
+  String? latitude;
+  String? longitude;
+
   Future<void> _submit(String cement_id, String steel_id, String prev_cement_id,
-      String prev_steel_id) async {
+      String prev_steel_id, String Location_id, String sellers_id) async {
     print("**********************");
     setState(() {
       _isloading = true;
     });
-    // final response = await http
-    //     .post(Uri.parse('https://asm.sortbe.com/api/Create-Lead'), body: {
-    //   'enc_string': 'HSjLAS82146',
-    // 'name': _name.text.toString(),
-    // 'mobile': _mobile.text.toString(),
-    // 'email': _email.text.toString(),
-    // 'address': _address.text.toString(),
-    // 'gst': _gst.text.toString(),
-    // 'client_type': _selecttype,
-    // 'enc_id': loginenc_id,
-    // 'project_name': _projname.text.toString(),
-    // 'location': _location.text.toString(),
-    // 'sqft': _abuildingsqft.text.toString(),
-    // 'building_type': _typeofbuilding.text.toString(),
-    // 'cement_id': cement_id,
-    // 'steel_id': steel_id,
-    // 'brick': _brick.text.toString(),
-    // 'sand': _sand.text.toString(),
-    // 'other_items': _otheritems.text.toString(),
-    // 'perv_seller_name': _sellername.text.toString(),
-    // 'brand': _brand.text.toString(),
-    // 'pricing': _pricing.text.toString(),
-    // 'prev_seller_address': _selleraddress.text.toString(),
-    // 'prev_seller_contact_no': _sellermobile.text.toString(),
-    // 'project_img_flag': imageflag.toString(),
-    // });
+
+    latitude = (await getlatitude()).toString();
+    longitude = (await getlongitude()).toString();
+    // ignore: unused_local_variable
     Dio dio = Dio();
 
     FormData formData = FormData.fromMap({
@@ -293,7 +327,7 @@ class _Lead_Creation_pageState extends State<Lead_Creation_page> {
       'client_type': _selecttype,
       'enc_id': loginenc_id,
       'project_name': _projname.text.toString(),
-      'location': _location.text.toString(),
+      'location': Location_id,
       'sqft': _abuildingsqft.text.toString(),
       'building_type': _typeofbuilding.text.toString(),
       'cement_id': cement_id,
@@ -301,37 +335,30 @@ class _Lead_Creation_pageState extends State<Lead_Creation_page> {
       'brick': _brick.text.toString(),
       'sand': _sand.text.toString(),
       'other_items': _otheritems.text.toString(),
-      'prev_seller_name': _sellername.text.toString(),
-      // 'brand': _brand.text.toString(),
-      // 'pricing': _pricing.text.toString(),
-      'cement_id': prev_cement_id,
-      'cement_price': cement_pricing.toString(),
-      'steel_id': prev_steel_id,
+      'prev_seller_name': sellers_id,
 
-      'steel_price': steel_pricing.toString(),
+      // ignore: equal_keys_in_map
+      'seller_cement_id': prev_cement_id,
+      'cement_price': cement_pricing.text.toString(),
+      // ignore: equal_keys_in_map
+      'seller_steel_id': prev_steel_id,
 
-      'prev_seller_address': _selleraddress.text.toString(),
-      'prev_seller_contact_no': _sellermobile.text.toString(),
+      'steel_price': steel_pricing.text.toString(),
+
+      // 'prev_seller_address': '',
+      // 'prev_seller_contact_no': '',
       'project_img_flag': imageflag.toString(),
       'project_img':
           imageselected ? await MultipartFile.fromFile(_image!.path) : null,
-      // if(imageflag == '1'){
-      //    'project_img':
-      // }
 
-      // imageflag == '1' ? await MultipartFile.fromFile(_image!.path) : ,
+      'lat': latitude.toString(),
+      'long': longitude.toString(),
     });
-    print(_sellername.text.toString());
-    print(_brand.text.toString());
-    // print(_pricing.text.toString());
-    print(_selleraddress.text.toString());
-    print(_sellermobile.text.toString());
 
-    //
-    // multiPartUpload(_image);
-    // print(_image!.path);
+    print(Location_id);
+    print(sellers_id);
 
-    String url = "https://asm.sortbe.com/api/Create-Lead";
+    String url = apiurl + "Create-Lead";
     var response = await Dio().post(url, data: formData);
     var data = response.data;
     print(data);
@@ -662,23 +689,83 @@ class _Lead_Creation_pageState extends State<Lead_Creation_page> {
                 const SizedBox(
                   height: 50,
                 ),
+                // TextFormField(
+                //   controller: _location,
+                //   textInputAction: TextInputAction.next,
+                //   autovalidateMode: AutovalidateMode.onUserInteraction,
+                //   // obscureText: true,
+                //   decoration: const InputDecoration(
+                //     labelText: 'Location of the Project',
+                //     border: OutlineInputBorder(),
+                //   ),
+                //   validator: (value) {
+                //     if (value!.isEmpty) {
+                //       return 'Please enter your location';
+                //     }
+                //     return null;
+                //   },
+                //   keyboardType: TextInputType.text,
+                // ),
                 TextFormField(
-                  controller: _location,
-                  textInputAction: TextInputAction.next,
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  // obscureText: true,
-                  decoration: const InputDecoration(
-                    labelText: 'Location of the Project',
-                    border: OutlineInputBorder(),
-                  ),
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return 'Please enter your location';
-                    }
-                    return null;
-                  },
-                  keyboardType: TextInputType.text,
-                ),
+                    textInputAction: TextInputAction.next,
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    decoration: const InputDecoration(
+                      // filled: true,
+                      // labelText: 'Option',
+                      hintText: 'Select the Location',
+                      border: OutlineInputBorder(),
+                      suffixIcon: Icon(Icons.arrow_drop_down_outlined),
+                    ),
+                    // validator: (value) {
+                    //   if (value == null || value.isEmpty) {
+                    //     return 'Please Select the Steel';
+                    //   }
+                    //   return null;
+                    // },
+                    readOnly: true,
+                    controller: TextEditingController(text: _selectlocation),
+                    onTap: () {
+                      showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Text('Select the Location',
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.w700)),
+                              content: Container(
+                                width: double.maxFinite,
+                                child: ListView.builder(
+                                  shrinkWrap: true,
+                                  itemCount: _locationoptions.length,
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    return GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          _selectlocation =
+                                              _locationoptions[index]
+                                                  ['location_name'];
+                                          locationindex =
+                                              _locationoptions[index]['id'];
+                                        });
+                                        Navigator.pop(context);
+                                      },
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(4.0),
+                                        child: Container(
+                                          padding: EdgeInsets.symmetric(
+                                              vertical: 10),
+                                          child: Text(_locationoptions[index]
+                                              ['location_name']),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            );
+                          });
+                    }),
                 const SizedBox(
                   height: 10,
                 ),
@@ -798,11 +885,14 @@ class _Lead_Creation_pageState extends State<Lead_Creation_page> {
                                         });
                                         Navigator.pop(context);
                                       },
-                                      child: Container(
-                                        padding:
-                                            EdgeInsets.symmetric(vertical: 10),
-                                        child:
-                                            Text(_cementoptions[index]['name']),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(4.0),
+                                        child: Container(
+                                          padding: EdgeInsets.symmetric(
+                                              vertical: 10),
+                                          child: Text(
+                                              _cementoptions[index]['name']),
+                                        ),
                                       ),
                                     );
                                   },
@@ -871,6 +961,7 @@ class _Lead_Creation_pageState extends State<Lead_Creation_page> {
                                   style:
                                       TextStyle(fontWeight: FontWeight.w700)),
                               content: Container(
+                                padding: EdgeInsets.symmetric(vertical: 10),
                                 width: double.maxFinite,
                                 child: ListView.builder(
                                   shrinkWrap: true,
@@ -887,11 +978,14 @@ class _Lead_Creation_pageState extends State<Lead_Creation_page> {
                                         });
                                         Navigator.pop(context);
                                       },
-                                      child: Container(
-                                        padding:
-                                            EdgeInsets.symmetric(vertical: 10),
-                                        child:
-                                            Text(_steeloptions[index]['name']),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(4.0),
+                                        child: Container(
+                                          padding: EdgeInsets.symmetric(
+                                              vertical: 10),
+                                          child: Text(
+                                              _steeloptions[index]['name']),
+                                        ),
                                       ),
                                     );
                                   },
@@ -951,7 +1045,6 @@ class _Lead_Creation_pageState extends State<Lead_Creation_page> {
                   children: [
                     InkWell(
                       onTap: () {
-                        _currentPageIndex--;
                         _pageController.previousPage(
                           duration: const Duration(milliseconds: 300),
                           curve: Curves.easeInOut,
@@ -1103,7 +1196,6 @@ class _Lead_Creation_pageState extends State<Lead_Creation_page> {
                             style: TextStyle(color: Colors.blue, fontSize: 17)),
                       )),
                   onTap: () {
-                    _currentPageIndex++;
                     _pageController.previousPage(
                       duration: const Duration(milliseconds: 300),
                       curve: Curves.easeInOut,
@@ -1127,7 +1219,6 @@ class _Lead_Creation_pageState extends State<Lead_Creation_page> {
                                   style: TextStyle(
                                       color: Colors.white, fontSize: 17)))),
                   onTap: () {
-                    _currentPageIndex++;
                     _pageController.nextPage(
                       duration: const Duration(milliseconds: 300),
                       curve: Curves.easeInOut,
@@ -1164,16 +1255,77 @@ class _Lead_Creation_pageState extends State<Lead_Creation_page> {
                   height: 50,
                 ),
                 //name
-                TextFormField(
-                  controller: _sellername,
-                  // obscureText: true,
-                  decoration: const InputDecoration(
-                    labelText: 'Seller\'s Name (optional)',
-                    border: OutlineInputBorder(),
-                  ),
+                // TextFormField(
+                //   controller: _sellername,
+                //   // obscureText: true,
+                //   decoration: const InputDecoration(
+                //     labelText: 'Seller\'s Name (optional)',
+                //     border: OutlineInputBorder(),
+                //   ),
 
-                  keyboardType: TextInputType.name,
-                ),
+                //   keyboardType: TextInputType.name,
+                // ),
+
+                TextFormField(
+                    textInputAction: TextInputAction.next,
+                    // autovalidateMode: AutovalidateMode.onUserInteraction,
+                    decoration: const InputDecoration(
+                      // filled: true,
+                      // labelText: 'Option',
+                      hintText: 'Select the Sellers name (optional)',
+                      border: OutlineInputBorder(),
+                      suffixIcon: Icon(Icons.arrow_drop_down_outlined),
+                    ),
+                    // validator: (value) {
+                    //   if (value == null || value.isEmpty) {
+                    //     return 'Please Select the Steel';
+                    //   }
+                    //   return null;
+                    // },
+                    readOnly: true,
+                    controller: TextEditingController(text: _selectsellersname),
+                    onTap: () {
+                      showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Text('Select the Seller',
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.w700)),
+                              content: Container(
+                                width: double.maxFinite,
+                                child: ListView.builder(
+                                  shrinkWrap: true,
+                                  itemCount: _sellersoptions.length,
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    return GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          _selectsellersname =
+                                              _sellersoptions[index]
+                                                  ['seller_name'];
+                                          sellersindex =
+                                              _sellersoptions[index]['id'];
+                                        });
+                                        Navigator.pop(context);
+                                      },
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(4.0),
+                                        child: Container(
+                                          padding: EdgeInsets.symmetric(
+                                              vertical: 10),
+                                          child: Text(_sellersoptions[index]
+                                              ['seller_name']),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            );
+                          });
+                    }),
                 const SizedBox(
                   height: 10,
                 ),
@@ -1218,24 +1370,24 @@ class _Lead_Creation_pageState extends State<Lead_Creation_page> {
                                 width: double.maxFinite,
                                 child: ListView.builder(
                                   shrinkWrap: true,
-                                  itemCount: _cementoptions.length,
+                                  itemCount: _prevcementoptions.length,
                                   itemBuilder:
                                       (BuildContext context, int index) {
                                     return GestureDetector(
                                       onTap: () {
                                         setState(() {
                                           _selectprevcement =
-                                              _cementoptions[index]['name'];
+                                              _prevcementoptions[index]['name'];
                                           cementprevindex =
-                                              _cementoptions[index]['id'];
+                                              _prevcementoptions[index]['id'];
                                         });
                                         Navigator.pop(context);
                                       },
                                       child: Container(
                                         padding:
                                             EdgeInsets.symmetric(vertical: 10),
-                                        child:
-                                            Text(_cementoptions[index]['name']),
+                                        child: Text(
+                                            _prevcementoptions[index]['name']),
                                       ),
                                     );
                                   },
@@ -1256,7 +1408,7 @@ class _Lead_Creation_pageState extends State<Lead_Creation_page> {
                     border: OutlineInputBorder(),
                   ),
 
-                  keyboardType: TextInputType.phone,
+                  keyboardType: TextInputType.text,
                 ),
                 const SizedBox(
                   height: 10,
@@ -1291,24 +1443,24 @@ class _Lead_Creation_pageState extends State<Lead_Creation_page> {
                                 width: double.maxFinite,
                                 child: ListView.builder(
                                   shrinkWrap: true,
-                                  itemCount: _steeloptions.length,
+                                  itemCount: _prevsteeloptions.length,
                                   itemBuilder:
                                       (BuildContext context, int index) {
                                     return GestureDetector(
                                       onTap: () {
                                         setState(() {
                                           _selectprevsteel =
-                                              _steeloptions[index]['name'];
+                                              _prevsteeloptions[index]['name'];
                                           steelprevindex =
-                                              _steeloptions[index]['id'];
+                                              _prevsteeloptions[index]['id'];
                                         });
                                         Navigator.pop(context);
                                       },
                                       child: Container(
                                         padding:
                                             EdgeInsets.symmetric(vertical: 10),
-                                        child:
-                                            Text(_steeloptions[index]['name']),
+                                        child: Text(
+                                            _prevsteeloptions[index]['name']),
                                       ),
                                     );
                                   },
@@ -1328,36 +1480,36 @@ class _Lead_Creation_pageState extends State<Lead_Creation_page> {
                     border: OutlineInputBorder(),
                   ),
 
-                  keyboardType: TextInputType.phone,
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                //address
-                TextFormField(
-                  controller: _selleraddress,
-                  // obscureText: true,
-                  decoration: const InputDecoration(
-                    labelText: 'Seller\'s Address (optional)',
-                    border: OutlineInputBorder(),
-                  ),
-
                   keyboardType: TextInputType.text,
                 ),
                 const SizedBox(
                   height: 10,
                 ),
-                //mobile
-                TextFormField(
-                  controller: _sellermobile,
-                  // obscureText: true,
-                  decoration: const InputDecoration(
-                    labelText: 'Seller\'s Contact Number (optional)',
-                    border: OutlineInputBorder(),
-                  ),
+                //address
+                // TextFormField(
+                //   controller: _selleraddress,
+                //   // obscureText: true,
+                //   decoration: const InputDecoration(
+                //     labelText: 'Seller\'s Address (optional)',
+                //     border: OutlineInputBorder(),
+                //   ),
 
-                  keyboardType: TextInputType.phone,
+                //   keyboardType: TextInputType.text,
+                // ),
+                const SizedBox(
+                  height: 10,
                 ),
+                //mobile
+                // TextFormField(
+                //   controller: _sellermobile,
+                //   // obscureText: true,
+                //   decoration: const InputDecoration(
+                //     labelText: 'Seller\'s Contact Number (optional)',
+                //     border: OutlineInputBorder(),
+                //   ),
+
+                //   keyboardType: TextInputType.phone,
+                // ),
                 const SizedBox(height: 40.0),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1377,7 +1529,6 @@ class _Lead_Creation_pageState extends State<Lead_Creation_page> {
                                     color: Colors.blue, fontSize: 17)),
                           )),
                       onTap: () {
-                        _currentPageIndex++;
                         _pageController.previousPage(
                           duration: const Duration(milliseconds: 300),
                           curve: Curves.easeInOut,
@@ -1386,11 +1537,21 @@ class _Lead_Creation_pageState extends State<Lead_Creation_page> {
                     ),
                     GestureDetector(
                       onTap: () {
+                        print("sellers index  :" + sellersindex.toString());
+                        print("location index :" + locationindex.toString());
+                        print("cement index :" + cementindex.toString());
+                        print("steelindex  : " + steelindex.toString());
+                        print(
+                            "prev steel index : " + steelprevindex.toString());
+                        print("prev cement index : " +
+                            cementprevindex.toString());
                         _submit(
                             cementindex.toString(),
                             steelindex.toString(),
                             cementprevindex.toString(),
-                            steelprevindex.toString());
+                            steelprevindex.toString(),
+                            locationindex.toString(),
+                            sellersindex.toString());
                       },
                       child: Container(
                         decoration: BoxDecoration(

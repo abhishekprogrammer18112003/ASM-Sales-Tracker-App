@@ -1,9 +1,11 @@
 import 'dart:convert';
 
+import 'package:asm_sales_tracker/constant.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+// ignore: must_be_immutable
 class Follow_Lead_List_Page extends StatefulWidget {
   late String enc_id;
 
@@ -18,8 +20,7 @@ class _Follow_Lead_List_PageState extends State<Follow_Lead_List_Page> {
   List<dynamic> _leadlist = [];
   Future<List?> getleadlist() async {
     print('****************************');
-    final response = await http
-        .post(Uri.parse("https://asm.sortbe.com/api/Follow-Leads"), body: {
+    final response = await http.post(Uri.parse(apiurl + "Follow-Leads"), body: {
       'enc_string': 'HSjLAS82146',
       'enc_id': loginenc_id,
     });

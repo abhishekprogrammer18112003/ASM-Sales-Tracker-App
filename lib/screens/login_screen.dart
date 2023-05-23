@@ -2,8 +2,9 @@
 
 import 'dart:convert';
 
+import 'package:asm_sales_tracker/constant.dart';
 import 'package:asm_sales_tracker/screens/nav_screen.dart';
-import 'package:flutter/foundation.dart';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -26,8 +27,7 @@ class _Login_ScreenState extends State<Login_Screen> {
     setState(() {
       _isloading = true;
     });
-    final response =
-        await http.post(Uri.parse('https://asm.sortbe.com/api/Login'), body: {
+    final response = await http.post(Uri.parse(apiurl + 'Login'), body: {
       'mobile': mobile,
       'password': password,
       'enc_string': 'HSjLAS82146',

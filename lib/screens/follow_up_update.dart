@@ -1,13 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
-import 'package:asm_sales_tracker/screens/closeleadfollowup.dart';
-import 'package:dio/dio.dart';
 
-import 'package:asm_sales_tracker/screens/follow_up_page.dart';
-import 'package:asm_sales_tracker/screens/nav_screen.dart';
+import 'package:asm_sales_tracker/constant.dart';
+import 'package:asm_sales_tracker/screens/closeleadfollowup.dart';
+
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
+
 import 'package:intl/intl.dart' as intl;
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -26,10 +24,8 @@ class _Follow_Up_updateState extends State<Follow_Up_update> {
   final FocusScopeNode _focusScopeNode = FocusScopeNode();
   bool _isloading = false;
   TextEditingController dateinput = TextEditingController();
-  TextEditingController _closereason = TextEditingController();
   String? loginenc_id;
   String? client_id;
-  bool _isloading1 = false;
 
   //text editing controller for text field
   Future<String?> getencid() async {
@@ -57,8 +53,8 @@ class _Follow_Up_updateState extends State<Follow_Up_update> {
     print(loginenc_id);
     print(client_id);
 
-    final response = await http
-        .post(Uri.parse('https://asm.sortbe.com/api/Follow-Update'), body: {
+    final response =
+        await http.post(Uri.parse(apiurl + 'Follow-Update'), body: {
       'enc_string': 'HSjLAS82146',
       'enc_id': loginenc_id.toString(),
       'client_id': client_id.toString(),
@@ -115,8 +111,8 @@ class _Follow_Up_updateState extends State<Follow_Up_update> {
 
   Future<List?> getfollowstatus() async {
     print('****************************');
-    final response = await http
-        .post(Uri.parse("https://asm.sortbe.com/api/Follow-Status"), body: {
+    final response =
+        await http.post(Uri.parse(apiurl + "Follow-Status"), body: {
       'enc_string': 'HSjLAS82146',
     });
 
@@ -131,7 +127,6 @@ class _Follow_Up_updateState extends State<Follow_Up_update> {
   }
 
   final _formKey = GlobalKey<FormState>();
-  final _formKey1 = GlobalKey<FormState>();
 
   final _reason = TextEditingController();
   @override

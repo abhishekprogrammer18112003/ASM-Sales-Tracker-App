@@ -1,11 +1,5 @@
-import 'dart:async';
-
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
 import 'screens/splash_screen.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 void main() async {
   // await location_permission();
@@ -58,7 +52,6 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
-        // This is the theme of your application.
         //
         // Try running your application with "flutter run". You'll see the
         // application has a blue toolbar. Then, without quitting the app, try
@@ -70,6 +63,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: Splash_Screen(),
+      // home: MyGridView(),
     );
   }
 }
