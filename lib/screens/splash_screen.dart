@@ -8,6 +8,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:asm_sales_tracker/constant.dart';
 
 class Splash_Screen extends StatefulWidget {
   @override
@@ -35,8 +36,7 @@ class _Splash_ScreenState extends State<Splash_Screen> {
     print("*********************");
     loginencid = await getclientid();
 
-    final response = await http
-        .post(Uri.parse('https://asm.sortbe.com/api/User-Check'), body: {
+    final response = await http.post(Uri.parse(apiurl + 'User-Check'), body: {
       'user_id': loginencid.toString(),
       'enc_string': 'HSjLAS82146',
     });

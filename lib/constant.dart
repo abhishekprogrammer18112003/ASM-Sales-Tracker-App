@@ -1,1 +1,1 @@
-String apiurl = 'https://asm.sortbe.com/api/';
+String apiurl = 'https://api.asmtrichy.com/api/';

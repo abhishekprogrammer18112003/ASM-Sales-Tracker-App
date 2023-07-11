@@ -1,7 +1,6 @@
 // ignore_for_file: prefer_typing_uninitialized_variables
 
 import 'dart:convert';
-
 import 'package:asm_sales_tracker/constant.dart';
 import 'package:asm_sales_tracker/screens/nav_screen.dart';
 
@@ -27,7 +26,8 @@ class _Login_ScreenState extends State<Login_Screen> {
     setState(() {
       _isloading = true;
     });
-    final response = await http.post(Uri.parse(apiurl + 'Login'), body: {
+    final response = await http
+        .post(Uri.parse('https://api.asmtrichy.com/api/Login'), body: {
       'mobile': mobile,
       'password': password,
       'enc_string': 'HSjLAS82146',
@@ -47,7 +47,10 @@ class _Login_ScreenState extends State<Login_Screen> {
         prefs.setBool('login_islogin', true);
         Navigator.pushReplacement(
             context, MaterialPageRoute(builder: (context) => Nav_Screen()));
-      } else {
+      } else if (data['status'] == 'User') {
+        setState(() {
+          _isloading = false;
+        });
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             behavior: SnackBarBehavior.floating,
             backgroundColor: Colors.transparent,
